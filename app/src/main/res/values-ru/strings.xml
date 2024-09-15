@@ -30,4 +30,5 @@
     <string name="change_password">Сменить пароль</string>
     <string name="change_username">Сменить имя пользователя</string>
     <string name="change_group">Сменить группу</string>
+    <string name="sign_out">Выйти с аккаунта</string>
 </resources>

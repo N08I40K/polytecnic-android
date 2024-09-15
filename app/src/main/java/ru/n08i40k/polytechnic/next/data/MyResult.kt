@@ -7,6 +7,3 @@ sealed interface MyResult<out R> {
     data class Failure(val exception: Exception) : MyResult<Nothing>
 }
 
-fun <T> MyResult<T>.successOr(fallback: T): T {
-    return (this as? MyResult.Success<T>)?.data ?: fallback
-}

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -136,6 +137,23 @@ internal fun ProfileCard(profile: Profile = FakeProfileRepository.exampleProfile
                             }
                         },
                     )
+
+                    Button(onClick = {
+                        runBlocking {
+                            context.settingsDataStore.updateData {
+                                it
+                                    .toBuilder()
+                                    .setGroup("")
+                                    .setAccessToken("")
+                                    .setUserId("")
+                                    .build()
+                            }
+                        }
+                        
+                        context.profileViewModel!!.onUnauthorized()
+                    }) {
+                        Text(stringResource(R.string.sign_out))
+                    }
 
                     if (passwordChanging) {
                         ChangePasswordDialog(

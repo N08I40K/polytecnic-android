@@ -7,6 +7,7 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class PolytechnicApplication : Application() {
+    @Suppress("unused")
     @Inject
     lateinit var container: AppContainer
 }

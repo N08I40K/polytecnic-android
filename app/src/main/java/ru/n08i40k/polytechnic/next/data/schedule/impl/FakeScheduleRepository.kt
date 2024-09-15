@@ -10,9 +10,10 @@ import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonTime
 import ru.n08i40k.polytechnic.next.model.LessonType
-import ru.n08i40k.polytechnic.next.data.MyResult;
+import ru.n08i40k.polytechnic.next.data.MyResult
 
 class FakeScheduleRepository : ScheduleRepository {
+    @Suppress("SpellCheckingInspection")
     companion object {
         val exampleGroup = Group(
             name = "ИС-214/23", days = arrayListOf(

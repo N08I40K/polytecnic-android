@@ -38,8 +38,10 @@ fun ScheduleScreen(
             }
 
             is ScheduleUiState.NoSchedule -> {
-                TextButton(onClick = onRefreshSchedule, modifier = Modifier.fillMaxSize()) {
-                    Text(stringResource(R.string.reload), textAlign = TextAlign.Center)
+                if (!uiState.isLoading) {
+                    TextButton(onClick = onRefreshSchedule, modifier = Modifier.fillMaxSize()) {
+                        Text(stringResource(R.string.reload), textAlign = TextAlign.Center)
+                    }
                 }
             }
         }

@@ -60,7 +60,7 @@ private fun tryChangeGroup(
 
 @Composable
 private fun getGroups(context: Context): ArrayList<String> {
-    val groupPlaceholder = stringResource(R.string.loading);
+    val groupPlaceholder = stringResource(R.string.loading)
 
     val groups = remember { arrayListOf(groupPlaceholder) }
 

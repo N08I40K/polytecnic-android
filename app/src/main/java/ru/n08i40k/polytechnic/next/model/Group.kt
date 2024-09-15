@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package ru.n08i40k.polytechnic.next.model
 
 import kotlinx.serialization.Serializable

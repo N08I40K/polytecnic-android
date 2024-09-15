@@ -41,8 +41,10 @@ fun ProfileScreen(
             }
 
             is ProfileUiState.NoProfile -> {
-                TextButton(onClick = onRefreshProfile, modifier = Modifier.fillMaxSize()) {
-                    Text(stringResource(R.string.reload), textAlign = TextAlign.Center)
+                if (!uiState.isLoading) {
+                    TextButton(onClick = onRefreshProfile, modifier = Modifier.fillMaxSize()) {
+                        Text(stringResource(R.string.reload), textAlign = TextAlign.Center)
+                    }
                 }
             }
         }

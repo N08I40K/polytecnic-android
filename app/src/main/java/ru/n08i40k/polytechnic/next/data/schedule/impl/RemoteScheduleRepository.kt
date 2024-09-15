@@ -14,7 +14,6 @@ import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetRequest
 import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetRequestData
 import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetResponse
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
-import java.lang.Thread.sleep
 
 class RemoteScheduleRepository(private val context: Context) : ScheduleRepository {
     override suspend fun getGroup(): MyResult<Group> {
@@ -24,7 +23,7 @@ class RemoteScheduleRepository(private val context: Context) : ScheduleRepositor
             }
 
             if (groupName.isEmpty())
-                return@withContext MyResult.Failure(RuntimeException("No group name provided!"))
+                return@withContext MyResult.Failure(IllegalArgumentException("No group name provided!"))
 
             val responseFuture = RequestFuture.newFuture<ScheduleGetResponse>()
             ScheduleGetRequest(

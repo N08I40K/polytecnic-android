@@ -447,6 +447,15 @@ fun tryRegister(
                 }
             }
 
+            runBlocking {
+                context.settingsDataStore.updateData { currentSettings ->
+                    currentSettings
+                        .toBuilder()
+                        .setGroup(group)
+                        .build()
+                }
+            }
+
             navController.navigate("main")
         }, {
             isLoading = false
