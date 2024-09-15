@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "946974192625",
+    "project_id": "polytecnicnext",
+    "storage_bucket": "polytecnicnext.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946974192625:android:f7981fae384940a882ca50",
+        "android_client_info": {
+          "package_name": "ru.n08i40k.polytechnic.next"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdE7os5ZLZSzwh6bY9ti-xAq6CXTJ7RBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

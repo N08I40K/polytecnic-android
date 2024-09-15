@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Polytechnic</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="login_title">Login</string>
+    <string name="register_title">Registration</string>
+    <string name="not_registered">Not registered?</string>
+    <string name="already_registered">Already registered?</string>
+    <string name="reload">Reload</string>
+    <string name="lesson_teacher">Teacher</string>
+    <string name="lesson_teachers">Teachers</string>
+    <string name="lesson_duration">Duration</string>
+    <string name="hours">h.</string>
+    <string name="minutes">min.</string>
+    <string name="lesson_break">Break</string>
+    <string name="schedule">Schedule</string>
+    <string name="profile">Profile</string>
+    <string name="role_student">Student</string>
+    <string name="role_teacher">Teacher</string>
+    <string name="role_admin">Administrator</string>
+    <string name="group">Group</string>
+    <string name="role">Role</string>
+    <string name="day_null">Schedule not updated yet.</string>
+    <string name="old_password">Old password</string>
+    <string name="new_password">New password</string>
+    <string name="change_password">Change password</string>
+    <string name="change_username">Change username</string>
+    <string name="loading">Loading…</string>
+    <string name="change_group">Change group</string>
+</resources>

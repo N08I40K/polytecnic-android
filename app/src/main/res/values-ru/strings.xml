@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Политехникум</string>
+    <string name="username">Имя пользователя</string>
+    <string name="password">Пароль</string>
+    <string name="register">Зарегистрироваться</string>
+    <string name="login">Авторизоваться</string>
+    <string name="login_title">Авторизация</string>
+    <string name="register_title">Регистрация</string>
+    <string name="not_registered">Не зарегистрированы?</string>
+    <string name="already_registered">Уже зарегистрированы?</string>
+    <string name="reload">Перезагрузить</string>
+    <string name="lesson_teacher">Преподаватель</string>
+    <string name="lesson_teachers">Преподаватели</string>
+    <string name="lesson_duration">Длительность</string>
+    <string name="hours">ч.</string>
+    <string name="minutes">мин.</string>
+    <string name="lesson_break">Перемена</string>
+    <string name="schedule">Расписание</string>
+    <string name="profile">Профиль</string>
+    <string name="role_student">Студент</string>
+    <string name="role_teacher">Преподаватель</string>
+    <string name="role_admin">Администратор</string>
+    <string name="group">Группа</string>
+    <string name="role">Роль</string>
+    <string name="day_null">Расписание ещё не обновилось.</string>
+    <string name="old_password">Старый пароль</string>
+    <string name="new_password">Новый пароль</string>
+    <string name="loading">Загрузка…</string>
+    <string name="change_password">Сменить пароль</string>
+    <string name="change_username">Сменить имя пользователя</string>
+    <string name="change_group">Сменить группу</string>
+</resources>
