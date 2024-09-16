@@ -8,5 +8,6 @@ data class ScheduleGetResponse(
     val updatedAt: String,
     val group: Group,
     val etag: String,
-    val lastChangedDays: ArrayList<Int>
+    val lastChangedDays: ArrayList<Int>,
+    val updateRequired: Boolean
 )
