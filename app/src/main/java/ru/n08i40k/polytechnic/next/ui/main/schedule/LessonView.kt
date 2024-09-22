@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -19,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -67,41 +67,44 @@ fun LessonExtraInfo(
     mutableExpanded: MutableState<Boolean> = mutableStateOf(true)
 ) {
     Dialog(onDismissRequest = { mutableExpanded.value = false }) {
-        Column(modifier = Modifier.padding(5.dp)) {
-            Text(lesson.name)
+        Card {
+            Column(Modifier.padding(10.dp)) {
+                Text(lesson.name)
 
-            if (lesson.teacherNames.isNotEmpty()) {
-                val teachers = buildString {
-                    append(stringResource(if (lesson.teacherNames.count() > 1) R.string.lesson_teachers else R.string.lesson_teacher))
-                    append(" - ")
-                    append(lesson.teacherNames.joinToString(", "))
+                if (lesson.teacherNames.isNotEmpty()) {
+                    val teachers = buildString {
+                        append(stringResource(if (lesson.teacherNames.count() > 1) R.string.lesson_teachers else R.string.lesson_teacher))
+                        append(" - ")
+                        append(lesson.teacherNames.joinToString(", "))
+                    }
+                    Text(teachers)
                 }
-                Text(teachers)
-            }
 
-            val duration = buildString {
-                append(stringResource(R.string.lesson_duration))
-                append(" - ")
-                val duration = if (lesson.time != null) lesson.time.end - lesson.time.start else 0
-
-                val hours = duration / 60
-                val minutes = duration % 60
-
-                append(hours)
-                append(stringResource(R.string.hours))
-                append(" ")
-                append(minutes)
-                append(stringResource(R.string.minutes))
-            }
-            Text(duration)
-
-            if (lesson.cabinets.isNotEmpty()) {
-                val cabinets = buildString {
-                    append(stringResource(R.string.cabinets))
+                val duration = buildString {
+                    append(stringResource(R.string.lesson_duration))
                     append(" - ")
-                    append(lesson.cabinets.joinToString(", "))
+                    val duration =
+                        if (lesson.time != null) lesson.time.end - lesson.time.start else 0
+
+                    val hours = duration / 60
+                    val minutes = duration % 60
+
+                    append(hours)
+                    append(stringResource(R.string.hours))
+                    append(" ")
+                    append(minutes)
+                    append(stringResource(R.string.minutes))
                 }
-                Text(cabinets)
+                Text(duration)
+
+                if (lesson.cabinets.isNotEmpty()) {
+                    val cabinets = buildString {
+                        append(stringResource(R.string.cabinets))
+                        append(" - ")
+                        append(lesson.cabinets.joinToString(", "))
+                    }
+                    Text(cabinets)
+                }
             }
         }
     }
@@ -114,7 +117,7 @@ private fun LessonViewRow(
     time: LessonTime? = LessonTime(0, 60),
     timeFormat: LessonTimeFormat = LessonTimeFormat.FROM_TO,
     name: String = "Test",
-    teacherNames: String? = "Хомченко Н.Е.",
+    teacherNames: ArrayList<String> = arrayListOf("Хомченко Н.Е.", "Хомченко Н.Е."),
     cabinets: ArrayList<String> = arrayListOf("14", "31"),
     cardColors: CardColors = CardDefaults.cardColors(),
     verticalPadding: Dp = 10.dp
@@ -123,8 +126,7 @@ private fun LessonViewRow(
         if (timeFormat == LessonTimeFormat.FROM_TO) cardColors.contentColor else cardColors.disabledContentColor
 
     Row(
-        modifier = Modifier
-            .padding(10.dp, verticalPadding),
+        modifier = Modifier.padding(10.dp, verticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -145,9 +147,7 @@ private fun LessonViewRow(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = formattedTime[0],
-                    fontFamily = FontFamily.Monospace,
-                    color = contentColor
+                    text = formattedTime[0], fontFamily = FontFamily.Monospace, color = contentColor
                 )
                 if (formattedTime.count() > 1) {
                     Text(
@@ -164,40 +164,54 @@ private fun LessonViewRow(
         Column(
             verticalArrangement = Arrangement.Center
         ) {
-            val fraction =
-                if (cabinets.size == 0) 1F
-                else if (cabinets.any { it.contains("/") }) 0.9F
-                else 0.925F
-            Text(
-                modifier = Modifier.fillMaxWidth(fraction),
-                text = name,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = contentColor
-            )
-            if (!teacherNames.isNullOrEmpty()) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(fraction),
-                    text = teacherNames,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = contentColor
-                )
-            }
-        }
+            val fraction = if (cabinets.size == 0) 1F
+            else if (cabinets.any { it.contains("/") }) 0.9F
+            else 0.925F
 
-        Column(verticalArrangement = Arrangement.Center) {
-            cabinets.forEach {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.End,
-                    text = it,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    color = contentColor
-                )
+
+            Row {
+                Column {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(fraction),
+                        text = name,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = contentColor
+                    )
+
+                    for (listIdx: Int in 0..<teacherNames.size) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(fraction),
+                            text = teacherNames[listIdx],
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = contentColor
+                        )
+                    }
+                }
+
+                Column {
+                    if (cabinets.size <= teacherNames.size) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "",
+                            maxLines = 1
+                        )
+                    }
+                    for (listIdx: Int in 0..<cabinets.size) {
+
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = cabinets[listIdx],
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = contentColor
+                        )
+                    }
+                }
             }
+
         }
     }
 }
@@ -216,7 +230,7 @@ fun FreeLessonRow(
         ) else null,
         LessonTimeFormat.ONLY_MINUTES_DURATION,
         stringResource(R.string.lesson_break),
-        null,
+        arrayListOf(),
         arrayListOf(),
         cardColors,
         2.5.dp
@@ -235,7 +249,7 @@ fun LessonRow(
         lesson.time,
         LessonTimeFormat.FROM_TO,
         lesson.name,
-        lesson.teacherNames.joinToString(", "),
+        lesson.teacherNames,
         lesson.cabinets,
         cardColors,
         5.dp

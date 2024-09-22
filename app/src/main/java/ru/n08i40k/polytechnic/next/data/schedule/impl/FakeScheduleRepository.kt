@@ -52,8 +52,8 @@ class FakeScheduleRepository : ScheduleRepository {
                             defaultIndex = 2,
                             name = "Операционные системы и среды",
                             time = LessonTime(655, 735),
-                            cabinets = arrayListOf("42"),
-                            teacherNames = arrayListOf("Сергачева А.О."),
+                            cabinets = arrayListOf("42", "52"),
+                            teacherNames = arrayListOf("Сергачева А.О.", "Не Сергачева А.О."),
                         ),
                         Lesson(
                             type = LessonType.DEFAULT,
@@ -61,7 +61,7 @@ class FakeScheduleRepository : ScheduleRepository {
                             name = "Физическая культура",
                             time = LessonTime(755, 835),
                             cabinets = arrayListOf("c/3"),
-                            teacherNames = arrayListOf("Васюнин В.Г."),
+                            teacherNames = arrayListOf("Васюнин В.Г.", "Не Васюнин В.Г."),
                         ),
                         Lesson(
                             type = LessonType.DEFAULT,
