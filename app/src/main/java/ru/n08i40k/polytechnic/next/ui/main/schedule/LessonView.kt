@@ -31,6 +31,36 @@ import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonTime
 
+private enum class LessonTimeFormat {
+    FROM_TO, ONLY_MINUTES_DURATION
+}
+
+private fun numWithZero(num: Int): String {
+    return "0".repeat(if (num <= 9) 1 else 0) + num.toString()
+}
+
+@Composable
+private fun fmtTime(start: Int, end: Int, format: LessonTimeFormat): ArrayList<String> {
+    return when (format) {
+        LessonTimeFormat.FROM_TO -> {
+            val startHour = numWithZero(start / 60)
+            val startMinute = numWithZero(start % 60)
+
+            val endHour = numWithZero(end / 60)
+            val endMinute = numWithZero(end % 60)
+
+            arrayListOf("$startHour:$startMinute", "$endHour:$endMinute")
+        }
+
+        LessonTimeFormat.ONLY_MINUTES_DURATION -> {
+            val duration = end - start
+
+            arrayListOf("$duration " + stringResource(R.string.minutes))
+        }
+    }
+}
+
+@Preview(showBackground = true)
 @Composable
 fun LessonExtraInfo(
     lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0]!!.lessons[0]!!,
@@ -38,6 +68,8 @@ fun LessonExtraInfo(
 ) {
     Dialog(onDismissRequest = { mutableExpanded.value = false }) {
         Column(modifier = Modifier.padding(5.dp)) {
+            Text(lesson.name)
+
             if (lesson.teacherNames.isNotEmpty()) {
                 val teachers = buildString {
                     append(stringResource(if (lesson.teacherNames.count() > 1) R.string.lesson_teachers else R.string.lesson_teacher))
@@ -61,18 +93,18 @@ fun LessonExtraInfo(
                 append(minutes)
                 append(stringResource(R.string.minutes))
             }
-
             Text(duration)
+
+            if (lesson.cabinets.isNotEmpty()) {
+                val cabinets = buildString {
+                    append(stringResource(R.string.cabinets))
+                    append(" - ")
+                    append(lesson.cabinets.joinToString(", "))
+                }
+                Text(cabinets)
+            }
         }
     }
-}
-
-private enum class LessonTimeFormat {
-    FROM_TO, ONLY_MINUTES_DURATION
-}
-
-private fun numWithZero(num: Int): String {
-    return "0".repeat(if (num <= 9) 1 else 0) + num.toString()
 }
 
 @Preview(showBackground = true)
@@ -105,23 +137,7 @@ private fun LessonViewRow(
         Spacer(Modifier.width(7.5.dp))
 
         if (time != null) {
-            val formattedTime: ArrayList<String> = when (timeFormat) {
-                LessonTimeFormat.FROM_TO -> {
-                    val startHour = numWithZero(time.start / 60)
-                    val startMinute = numWithZero(time.start % 60)
-
-                    val endHour = numWithZero(time.end / 60)
-                    val endMinute = numWithZero(time.end % 60)
-
-                    arrayListOf("$startHour:$startMinute", "$endHour:$endMinute")
-                }
-
-                LessonTimeFormat.ONLY_MINUTES_DURATION -> {
-                    val duration = time.end - time.start
-
-                    arrayListOf("$duration " + stringResource(R.string.minutes))
-                }
-            }
+            val formattedTime: ArrayList<String> = fmtTime(time.start, time.end, timeFormat)
 
             Column(
                 modifier = Modifier.fillMaxWidth(0.25f),
@@ -148,8 +164,12 @@ private fun LessonViewRow(
         Column(
             verticalArrangement = Arrangement.Center
         ) {
+            val fraction =
+                if (cabinets.size == 0) 1F
+                else if (cabinets.any { it.contains("/") }) 0.9F
+                else 0.925F
             Text(
-                modifier = Modifier.fillMaxWidth(0.85f),
+                modifier = Modifier.fillMaxWidth(fraction),
                 text = name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -157,7 +177,7 @@ private fun LessonViewRow(
             )
             if (!teacherNames.isNullOrEmpty()) {
                 Text(
-                    modifier = Modifier.fillMaxWidth(0.85f),
+                    modifier = Modifier.fillMaxWidth(fraction),
                     text = teacherNames,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -166,15 +186,19 @@ private fun LessonViewRow(
             }
         }
 
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.End,
-            text = cabinets.joinToString(", "),
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            color = contentColor
-        )
+        Column(verticalArrangement = Arrangement.Center) {
+            cabinets.forEach {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                    text = it,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    color = contentColor
+                )
+            }
+        }
     }
 }
 

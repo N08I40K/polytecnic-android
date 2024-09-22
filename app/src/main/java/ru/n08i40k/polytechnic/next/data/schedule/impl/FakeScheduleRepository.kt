@@ -44,7 +44,7 @@ class FakeScheduleRepository : ScheduleRepository {
                             defaultIndex = 1,
                             name = "Элементы высшей математики",
                             time = LessonTime(565, 645),
-                            cabinets = arrayListOf("31"),
+                            cabinets = arrayListOf("31", "12"),
                             teacherNames = arrayListOf("Цацаева Т.Н."),
                         ),
                         Lesson(
