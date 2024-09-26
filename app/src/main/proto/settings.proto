@@ -3,8 +3,14 @@ syntax = "proto3";
 option java_package = "ru.n08i40k.polytechnic.next";
 option java_multiple_files = true;
 
+message CachedResponse {
+  string hash = 1;
+  string data = 2;
+}
+
 message Settings {
   string user_id = 1;
   string access_token = 2;
   string group = 3;
+  map<string, CachedResponse> cache_storage = 4;
 }

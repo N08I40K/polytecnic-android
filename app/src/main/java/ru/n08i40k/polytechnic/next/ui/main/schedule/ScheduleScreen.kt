@@ -6,6 +6,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,7 +20,7 @@ import ru.n08i40k.polytechnic.next.ui.model.ScheduleViewModel
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ScheduleScreen(
-    scheduleViewModel: ScheduleViewModel = ScheduleViewModel(MockAppContainer()),
+    scheduleViewModel: ScheduleViewModel = ScheduleViewModel(MockAppContainer(LocalContext.current)),
     onRefreshSchedule: () -> Unit = {}
 ) {
     val uiState by scheduleViewModel.uiState.collectAsStateWithLifecycle()

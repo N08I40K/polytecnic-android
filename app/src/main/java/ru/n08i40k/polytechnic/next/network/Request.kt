@@ -69,7 +69,7 @@ open class RequestBase(
     listener: Response.Listener<String>,
     errorListener: Response.ErrorListener?
 ) : StringRequest(method, NetworkValues.API_HOST + url, listener, errorListener) {
-    fun send() {
+    open fun send() {
         Logger.getLogger("RequestBase").info("Sending request to $url")
         NetworkConnection.getInstance(context).addToRequestQueue(this)
     }

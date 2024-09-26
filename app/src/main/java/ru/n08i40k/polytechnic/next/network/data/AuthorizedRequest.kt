@@ -13,7 +13,7 @@ import ru.n08i40k.polytechnic.next.ui.model.profileViewModel
 open class AuthorizedRequest(
     context: Context,
     method: Int,
-    url: String?,
+    url: String,
     listener: Response.Listener<String>,
     errorListener: Response.ErrorListener?,
     private val canBeUnauthorized: Boolean = false
