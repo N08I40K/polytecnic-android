@@ -6,4 +6,6 @@ import kotlinx.serialization.Serializable
 data class ScheduleGetCacheStatusResponse(
     val cacheUpdateRequired: Boolean,
     val cacheHash: String,
+    val lastCacheUpdate: Long,
+    val lastScheduleUpdate: Long,
 )

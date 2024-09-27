@@ -77,6 +77,7 @@ open class RequestBase(
     override fun getHeaders(): MutableMap<String, String> {
         val headers = mutableMapOf<String, String>()
         headers["Content-Type"] = "application/json; charset=utf-8"
+        headers["version"] = "1"
 
         return headers
     }

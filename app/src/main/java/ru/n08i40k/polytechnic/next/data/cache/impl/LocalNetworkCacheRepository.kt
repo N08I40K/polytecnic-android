@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ru.n08i40k.polytechnic.next.CachedResponse
+import ru.n08i40k.polytechnic.next.UpdateDates
 import ru.n08i40k.polytechnic.next.data.cache.NetworkCacheRepository
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 import javax.inject.Inject
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class LocalNetworkCacheRepository
 @Inject constructor(private val applicationContext: Context) : NetworkCacheRepository {
     private val cacheMap: MutableMap<String, CachedResponse> = mutableMapOf()
+    private var updateDates: UpdateDates = UpdateDates.newBuilder().build()
     private var hash: String? = null
 
     init {
@@ -75,18 +77,38 @@ class LocalNetworkCacheRepository
             this.cacheMap
                 .mapNotNull { if (it.value.hash != this.hash) it.key else null }
                 .forEach { this.cacheMap.remove(it) }
+            save()
         }
+    }
+
+    override suspend fun getUpdateDates(): UpdateDates {
+        return this.updateDates
+    }
+
+    override suspend fun setUpdateDates(cache: Long, schedule: Long) {
+        updateDates = UpdateDates
+            .newBuilder()
+            .setCache(cache)
+            .setSchedule(schedule).build()
+
+        withContext(Dispatchers.IO) {
+            applicationContext.settingsDataStore.updateData {
+                it
+                    .toBuilder()
+                    .setUpdateDates(updateDates)
+                    .build()
+            }
+        }
+        save()
     }
 
     private suspend fun save() {
         withContext(Dispatchers.IO) {
-            runBlocking {
-                applicationContext.settingsDataStore.updateData {
-                    it
-                        .toBuilder()
-                        .putAllCacheStorage(cacheMap)
-                        .build()
-                }
+            applicationContext.settingsDataStore.updateData {
+                it
+                    .toBuilder()
+                    .putAllCacheStorage(cacheMap)
+                    .build()
             }
         }
     }

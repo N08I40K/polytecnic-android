@@ -32,4 +32,8 @@
     <string name="change_group">Сменить группу</string>
     <string name="sign_out">Выйти с аккаунта</string>
     <string name="cabinets">Кабинеты</string>
+    <string name="last_local_update">Последнее локальное обновление</string>
+    <string name="last_server_cache_update">Последнее обновление кеша</string>
+    <string name="last_server_schedule_update">Последнее обновление расписания</string>
+    <string name="update_info_header">Дополнительная информация</string>
 </resources>

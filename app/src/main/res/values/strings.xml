@@ -32,4 +32,8 @@
     <string name="change_group">Change group</string>
     <string name="sign_out">Sign out</string>
     <string name="cabinets">Cabinets</string>
+    <string name="last_local_update">Last local update</string>
+    <string name="last_server_cache_update">Last server cache update</string>
+    <string name="last_server_schedule_update">Last server schedule update</string>
+    <string name="update_info_header">Additional information</string>
 </resources>

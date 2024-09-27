@@ -8,9 +8,15 @@ message CachedResponse {
   string data = 2;
 }
 
+message UpdateDates {
+  int64 cache = 1;
+  int64 schedule = 2;
+}
+
 message Settings {
   string user_id = 1;
   string access_token = 2;
   string group = 3;
   map<string, CachedResponse> cache_storage = 4;
+  UpdateDates update_dates = 5;
 }

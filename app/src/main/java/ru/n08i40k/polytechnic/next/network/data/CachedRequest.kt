@@ -97,7 +97,10 @@ open class CachedRequest(
 
             if (!response.cacheUpdateRequired) {
                 logger.info("Cache update was not required!")
-                runBlocking { repository.setHash(response.cacheHash) }
+                runBlocking {
+                    repository.setUpdateDates(response.lastCacheUpdate, response.lastScheduleUpdate)
+                    repository.setHash(response.cacheHash)
+                }
             } else {
                 logger.info("Cache update was required!")
                 val updateResult = runBlocking { updateMainPage() }
@@ -105,7 +108,13 @@ open class CachedRequest(
                 when (updateResult) {
                     is MyResult.Success -> {
                         logger.info("Cache update was successful!")
-                        runBlocking { repository.setHash(updateResult.data.cacheHash) }
+                        runBlocking {
+                            repository.setUpdateDates(
+                                updateResult.data.lastCacheUpdate,
+                                updateResult.data.lastScheduleUpdate
+                            )
+                            repository.setHash(updateResult.data.cacheHash)
+                        }
                     }
 
                     is MyResult.Failure -> {
