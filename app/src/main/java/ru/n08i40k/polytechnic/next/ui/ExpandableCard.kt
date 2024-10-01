@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -46,10 +48,13 @@ fun ExpandableCard(
 
     val transition = rememberTransition(transitionState)
 
-    Card(modifier = modifier.clickable {
-        onExpandedChange()
-        transitionState.targetState = expanded
-    }) {
+    Card(
+        modifier = modifier.clickable {
+            onExpandedChange()
+            transitionState.targetState = expanded
+        },
+        shape = RectangleShape
+    ) {
         Column {
             ExpandableCardHeader(title, transition)
             ExpandableCardContent(visible = expanded, content = content)
@@ -83,6 +88,7 @@ private fun ExpandableCardContent(
         enter = enterTransition,
         exit = exitTransition
     ) {
+        HorizontalDivider()
         content()
     }
 }

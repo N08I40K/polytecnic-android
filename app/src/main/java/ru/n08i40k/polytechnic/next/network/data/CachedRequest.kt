@@ -2,7 +2,6 @@ package ru.n08i40k.polytechnic.next.network.data
 
 import android.content.Context
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.RequestFuture
 import com.android.volley.toolbox.StringRequest
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +15,8 @@ import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetCacheStatusR
 import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetCacheStatusResponse
 import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleUpdateRequest
 import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleUpdateRequestData
+import ru.n08i40k.polytechnic.next.network.tryFuture
+import ru.n08i40k.polytechnic.next.network.tryGet
 import java.util.logging.Logger
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -47,61 +48,58 @@ open class CachedRequest(
             )
             NetworkConnection.getInstance(context).addToRequestQueue(request)
 
-            try {
-                val encodedMainPage =
-                    Base64.Default.encode(mainPageFuture.get().encodeToByteArray())
-                MyResult.Success(encodedMainPage)
-            } catch (exception: Exception) {
-                MyResult.Failure(exception)
+            when (val response = tryGet(mainPageFuture)) {
+                is MyResult.Failure -> response
+                is MyResult.Success -> {
+                    val encodedMainPage = Base64.Default.encode(response.data.encodeToByteArray())
+                    MyResult.Success(encodedMainPage)
+                }
             }
         }
     }
 
     private suspend fun updateMainPage(): MyResult<ScheduleGetCacheStatusResponse> {
         return withContext(Dispatchers.IO) {
-            val mainPage = getMainPage()
-
-            if (mainPage is MyResult.Failure)
-                return@withContext mainPage
-
-            val updateFuture = RequestFuture.newFuture<ScheduleGetCacheStatusResponse>()
-            ScheduleUpdateRequest(
-                ScheduleUpdateRequestData((mainPage as MyResult.Success<String>).data),
-                context,
-                updateFuture,
-                updateFuture
-            ).send()
-
-            try {
-                MyResult.Success(updateFuture.get())
-            } catch (exception: Exception) {
-                MyResult.Failure(exception)
+            when (val mainPage = getMainPage()) {
+                is MyResult.Failure -> mainPage
+                is MyResult.Success -> {
+                    tryFuture {
+                        ScheduleUpdateRequest(
+                            ScheduleUpdateRequestData(mainPage.data),
+                            context,
+                            it,
+                            it
+                        )
+                    }
+                }
             }
         }
     }
 
     override fun send() {
         val logger = Logger.getLogger("CachedRequest")
-
         val repository = appContainer.networkCacheRepository
 
-        val future = RequestFuture.newFuture<ScheduleGetCacheStatusResponse>()
-
         logger.info("Getting cache status...")
-        ScheduleGetCacheStatusRequest(context, future, future).send()
 
-        try {
-            val response = future.get()
+        val cacheStatusResult = tryFuture {
+            ScheduleGetCacheStatusRequest(context, it, it)
+        }
+
+        if (cacheStatusResult is MyResult.Success) {
+            val cacheStatus = cacheStatusResult.data
 
             logger.info("Cache status received successfully!")
 
-            if (!response.cacheUpdateRequired) {
-                logger.info("Cache update was not required!")
-                runBlocking {
-                    repository.setUpdateDates(response.lastCacheUpdate, response.lastScheduleUpdate)
-                    repository.setHash(response.cacheHash)
-                }
-            } else {
+            runBlocking {
+                repository.setUpdateDates(
+                    cacheStatus.lastCacheUpdate,
+                    cacheStatus.lastScheduleUpdate
+                )
+                repository.setHash(cacheStatus.cacheHash)
+            }
+
+            if (cacheStatus.cacheUpdateRequired) {
                 logger.info("Cache update was required!")
                 val updateResult = runBlocking { updateMainPage() }
 
@@ -119,16 +117,11 @@ open class CachedRequest(
 
                     is MyResult.Failure -> {
                         logger.warning("Failed to update cache!")
-                        super.getErrorListener()
-                            ?.onErrorResponse(updateResult.exception.cause as VolleyError)
-                        return
                     }
                 }
             }
-        } catch (exception: Exception) {
+        } else {
             logger.warning("Failed to get cache status!")
-            super.getErrorListener()?.onErrorResponse(exception.cause as VolleyError)
-            return
         }
 
         val cachedResponse = runBlocking { repository.get(url) }

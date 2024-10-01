@@ -1,7 +1,6 @@
 package ru.n08i40k.polytechnic.next.data.schedule.impl
 
 import android.content.Context
-import com.android.volley.toolbox.RequestFuture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -12,7 +11,7 @@ import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Group
 import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetRequest
 import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetRequestData
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetResponse
+import ru.n08i40k.polytechnic.next.network.tryFuture
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 
 class RemoteScheduleRepository(private val context: Context) : ScheduleRepository {
@@ -27,18 +26,18 @@ class RemoteScheduleRepository(private val context: Context) : ScheduleRepositor
             if (groupName.isEmpty())
                 return@withContext MyResult.Failure(IllegalArgumentException("No group name provided!"))
 
-            val future = RequestFuture.newFuture<ScheduleGetResponse>()
-            ScheduleGetRequest(
-                ScheduleGetRequestData(groupName),
-                context,
-                future,
-                future
-            ).send()
+            val response = tryFuture {
+                ScheduleGetRequest(
+                    ScheduleGetRequestData(groupName),
+                    context,
+                    it,
+                    it
+                )
+            }
 
-            try {
-                MyResult.Success(future.get().group)
-            } catch (exception: Exception) {
-                MyResult.Failure(exception)
+            when (response) {
+                is MyResult.Failure -> response
+                is MyResult.Success -> MyResult.Success(response.data.group)
             }
         }
     }

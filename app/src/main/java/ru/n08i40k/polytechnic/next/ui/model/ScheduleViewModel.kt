@@ -9,9 +9,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.n08i40k.polytechnic.next.UpdateDates
 import ru.n08i40k.polytechnic.next.data.AppContainer
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.model.Group
+import java.util.Date
+import java.util.logging.Logger
 import javax.inject.Inject
 
 sealed interface ScheduleUiState {
@@ -23,18 +26,22 @@ sealed interface ScheduleUiState {
 
     data class HasSchedule(
         val group: Group,
+        val updateDates: UpdateDates,
+        val lastUpdateAt: Long,
         override val isLoading: Boolean
     ) : ScheduleUiState
 }
 
 private data class ScheduleViewModelState(
     val group: Group? = null,
+    val updateDates: UpdateDates? = null,
+    val lastUpdateAt: Long = 0,
     val isLoading: Boolean = false
 ) {
     fun toUiState(): ScheduleUiState = if (group == null) {
         ScheduleUiState.NoSchedule(isLoading)
     } else {
-        ScheduleUiState.HasSchedule(group, isLoading)
+        ScheduleUiState.HasSchedule(group, updateDates!!, lastUpdateAt, isLoading)
     }
 }
 
@@ -43,6 +50,7 @@ class ScheduleViewModel @Inject constructor(
     appContainer: AppContainer
 ) : ViewModel() {
     private val scheduleRepository = appContainer.scheduleRepository
+    private val networkCacheRepository = appContainer.networkCacheRepository
     private val viewModelState = MutableStateFlow(ScheduleViewModelState(isLoading = true))
 
     val uiState = viewModelState
@@ -61,8 +69,23 @@ class ScheduleViewModel @Inject constructor(
 
             viewModelState.update {
                 when (result) {
-                    is MyResult.Success -> it.copy(group = result.data, isLoading = false)
-                    is MyResult.Failure -> it.copy(group = null, isLoading = false)
+                    is MyResult.Success -> {
+                        val updateDates = networkCacheRepository.getUpdateDates()
+
+                        Logger.getLogger("ScheduleViewModel").info("Updating...")
+
+                        it.copy(
+                            group = result.data,
+                            updateDates = updateDates,
+                            lastUpdateAt = Date().time,
+                            isLoading = false
+                        )
+                    }
+
+                    is MyResult.Failure -> it.copy(
+                        group = null,
+                        isLoading = false
+                    )
                 }
             }
         }

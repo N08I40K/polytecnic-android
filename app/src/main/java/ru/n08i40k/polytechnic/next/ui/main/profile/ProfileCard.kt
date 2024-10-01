@@ -149,7 +149,7 @@ internal fun ProfileCard(profile: Profile = FakeProfileRepository.exampleProfile
                                     .build()
                             }
                         }
-                        
+
                         context.profileViewModel!!.onUnauthorized()
                     }) {
                         Text(stringResource(R.string.sign_out))

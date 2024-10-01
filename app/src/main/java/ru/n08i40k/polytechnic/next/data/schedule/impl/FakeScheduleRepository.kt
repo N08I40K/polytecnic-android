@@ -4,13 +4,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
+import ru.n08i40k.polytechnic.next.data.MyResult
+import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Group
-import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonTime
 import ru.n08i40k.polytechnic.next.model.LessonType
-import ru.n08i40k.polytechnic.next.data.MyResult
 
 class FakeScheduleRepository : ScheduleRepository {
     @Suppress("SpellCheckingInspection")

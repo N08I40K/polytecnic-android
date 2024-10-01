@@ -1,6 +1,7 @@
 package ru.n08i40k.polytechnic.next.ui.main.schedule
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -28,7 +29,8 @@ fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
     HorizontalPager(
         state = pagerState,
         contentPadding = PaddingValues(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier.height(600.dp)
     ) { page ->
         DayCard(
             modifier = Modifier.graphicsLayer {
@@ -37,8 +39,8 @@ fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
                 lerp(
                     start = 0.95f, stop = 1f, fraction = 1f - offset.coerceIn(0f, 1f)
                 ).also { scale ->
-                    scaleX = scale
-                    scaleY = scale
+                    scaleX = 1F - scale + 0.95F
+                    scaleY = 1F - scale + 0.95F
                 }
                 alpha = lerp(
                     start = 0.5f, stop = 1f, fraction = 1f - offset.coerceIn(0f, 1f)

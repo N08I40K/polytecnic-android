@@ -7,7 +7,6 @@ import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.data.users.ProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
 import ru.n08i40k.polytechnic.next.model.UserRole
-import java.lang.Exception
 
 class FakeProfileRepository : ProfileRepository {
     private var counter = 0

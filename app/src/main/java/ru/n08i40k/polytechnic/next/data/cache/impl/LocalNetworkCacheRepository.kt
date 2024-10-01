@@ -32,12 +32,12 @@ class LocalNetworkCacheRepository
     }
 
     override suspend fun get(url: String): CachedResponse? {
-        if (this.hash == null)
-            return null
+        // Если кешированого ответа нет, то возвращаем null
+        // Если хеши не совпадают и локальный хеш присутствует, то возвращаем null
 
-        val response = cacheMap[url]
+        val response = cacheMap[url] ?: return null
 
-        if (response?.hash != this.hash)
+        if (response.hash != this.hash && this.hash != null)
             return null
 
         return response
