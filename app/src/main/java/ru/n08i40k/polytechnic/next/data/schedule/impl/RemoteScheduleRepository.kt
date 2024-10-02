@@ -9,8 +9,8 @@ import kotlinx.coroutines.withContext
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Group
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetRequest
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetRequestData
+import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetReq
+import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetReqData
 import ru.n08i40k.polytechnic.next.network.tryFuture
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 
@@ -27,8 +27,8 @@ class RemoteScheduleRepository(private val context: Context) : ScheduleRepositor
                 return@withContext MyResult.Failure(IllegalArgumentException("No group name provided!"))
 
             val response = tryFuture {
-                ScheduleGetRequest(
-                    ScheduleGetRequestData(groupName),
+                ScheduleGetReq(
+                    ScheduleGetReqData(groupName),
                     context,
                     it,
                     it

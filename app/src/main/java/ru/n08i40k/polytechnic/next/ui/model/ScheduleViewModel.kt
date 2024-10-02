@@ -1,6 +1,6 @@
 package ru.n08i40k.polytechnic.next.ui.model
 
-import androidx.lifecycle.ViewModel
+кimport androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +14,6 @@ import ru.n08i40k.polytechnic.next.data.AppContainer
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.model.Group
 import java.util.Date
-import java.util.logging.Logger
 import javax.inject.Inject
 
 sealed interface ScheduleUiState {
@@ -71,8 +70,6 @@ class ScheduleViewModel @Inject constructor(
                 when (result) {
                     is MyResult.Success -> {
                         val updateDates = networkCacheRepository.getUpdateDates()
-
-                        Logger.getLogger("ScheduleViewModel").info("Updating...")
 
                         it.copy(
                             group = result.data,

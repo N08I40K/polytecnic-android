@@ -57,8 +57,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ru.n08i40k.polytechnic.next.R
-import ru.n08i40k.polytechnic.next.model.AcceptableUserRoles
 import ru.n08i40k.polytechnic.next.model.UserRole
+import ru.n08i40k.polytechnic.next.model.UserRole.Companion.AcceptableUserRoles
 import ru.n08i40k.polytechnic.next.network.data.auth.LoginRequest
 import ru.n08i40k.polytechnic.next.network.data.auth.LoginRequestData
 import ru.n08i40k.polytechnic.next.network.data.auth.RegisterRequest
@@ -125,27 +125,29 @@ private fun LoginForm(
         Text(text = stringResource(R.string.not_registered))
     }
 
-    Button(onClick = {
-        if (username.length < 4) usernameError = true
-        if (password.isEmpty()) passwordError = true
+    Button(
+        enabled = !mutableIsLoading.value,
+        onClick = {
+            if (username.length < 4) usernameError = true
+            if (password.isEmpty()) passwordError = true
 
-        if (usernameError || passwordError) return@Button
+            if (usernameError || passwordError) return@Button
 
-        tryLogin(
-            username,
-            password,
-            mutableUsernameError,
-            mutablePasswordError,
-            mutableIsLoading,
-            context,
-            snackbarHostState,
-            scope,
-            navController
-        )
+            tryLogin(
+                username,
+                password,
+                mutableUsernameError,
+                mutablePasswordError,
+                mutableIsLoading,
+                context,
+                snackbarHostState,
+                scope,
+                navController
+            )
 
-        mutableIsLoading.value = true
-        focusManager.clearFocus()
-    }) {
+            focusManager.clearFocus()
+        }
+    ) {
         Text(
             text = stringResource(R.string.login),
             style = MaterialTheme.typography.bodyLarge
@@ -253,9 +255,9 @@ private fun RegisterForm(
                 navController
             )
 
-            mutableIsLoading.value = true
             focusManager.clearFocus()
-        }) {
+        }
+    ) {
         Text(
             text = stringResource(R.string.register),
             style = MaterialTheme.typography.bodyLarge
@@ -364,9 +366,9 @@ fun tryLogin(
 ) {
     var isLoading by mutableIsLoading
 
-    LoginRequest(LoginRequestData(username, password), context, {
-        scope.launch { snackbarHostState.showSnackbar("Cool!") }
+    isLoading = true
 
+    LoginRequest(LoginRequestData(username, password), context, {
         runBlocking {
             context.settingsDataStore.updateData { currentSettings ->
                 currentSettings
@@ -378,6 +380,8 @@ fun tryLogin(
         }
 
         UsersMeRequest(context, {
+            scope.launch { snackbarHostState.showSnackbar("Cool!") }
+
             runBlocking {
                 context.settingsDataStore.updateData { currentSettings ->
                     currentSettings
@@ -388,7 +392,7 @@ fun tryLogin(
             }
 
             navController.navigate("main")
-        }, {}).send()
+        }, null).send()
     }, {
         isLoading = false
 
@@ -430,6 +434,8 @@ fun tryRegister(
     navController: NavHostController
 ) {
     var isLoading by mutableIsLoading
+
+    isLoading = true
 
     RegisterRequest(
         RegisterRequestData(

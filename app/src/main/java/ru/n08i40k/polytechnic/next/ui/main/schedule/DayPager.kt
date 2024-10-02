@@ -16,7 +16,7 @@ import ru.n08i40k.polytechnic.next.model.Group
 import java.util.Calendar
 import kotlin.math.absoluteValue
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview
 @Composable
 fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
     val currentDay = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2)

@@ -36,4 +36,8 @@
     <string name="last_server_cache_update">Последнее обновление кеша</string>
     <string name="last_server_schedule_update">Последнее обновление расписания</string>
     <string name="update_info_header">Дополнительная информация</string>
+    <string name="replacer">Заменитель</string>
+    <string name="bytes">байт</string>
+    <string name="clear_replacers">Удалить всё</string>
+    <string name="set_replacer">Загрузить новое расписание</string>
 </resources>

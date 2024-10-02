@@ -6,15 +6,17 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.n08i40k.polytechnic.next.network.data.AuthorizedRequest
 
-class ScheduleUpdateRequest(
-    private val data: ScheduleUpdateRequestData,
+class ScheduleUpdateReq(
+    private val data: ScheduleUpdateReqData,
     context: Context,
-    listener: Response.Listener<ScheduleGetCacheStatusResponse>,
+    listener: Response.Listener<ScheduleGetCacheStatusResData>,
     errorListener: Response.ErrorListener? = null
 ) : AuthorizedRequest(
-    context, Method.POST, "schedule/update-site-main-page", Response.Listener<String> {
-        listener.onResponse(Json.decodeFromString<ScheduleGetCacheStatusResponse>(it))
-    }, errorListener
+    context,
+    Method.POST,
+    "schedule/update-site-main-page",
+    { listener.onResponse(Json.decodeFromString(it)) },
+    errorListener
 ) {
     override fun getBody(): ByteArray {
         return Json.encodeToString(data).toByteArray()

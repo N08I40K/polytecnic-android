@@ -5,12 +5,14 @@ import com.android.volley.Response
 import kotlinx.serialization.json.Json
 import ru.n08i40k.polytechnic.next.network.data.CachedRequest
 
-class ScheduleGetGroupNamesRequest(
+class ScheduleGetGroupNamesReq(
     context: Context,
-    listener: Response.Listener<ScheduleGetGroupNamesResponseData>,
+    listener: Response.Listener<ScheduleGetGroupNamesResData>,
     errorListener: Response.ErrorListener? = null
 ) : CachedRequest(
-    context, Method.GET, "schedule/get-group-names", Response.Listener<String> { response ->
-        listener.onResponse(Json.decodeFromString<ScheduleGetGroupNamesResponseData>(response))
-    }, errorListener
+    context,
+    Method.GET,
+    "schedule/get-group-names",
+    { listener.onResponse(Json.decodeFromString(it)) },
+    errorListener
 )

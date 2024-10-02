@@ -20,9 +20,9 @@
               <option name="versions">
                 <list>
                   <VersionSetting>
-                    <option name="buildVersion" value="7" />
-                    <option name="displayName" value="1.3.1 (7)" />
-                    <option name="displayVersion" value="1.3.1" />
+                    <option name="buildVersion" value="8" />
+                    <option name="displayName" value="1.3.2 (8)" />
+                    <option name="displayVersion" value="1.3.2" />
                   </VersionSetting>
                 </list>
               </option>

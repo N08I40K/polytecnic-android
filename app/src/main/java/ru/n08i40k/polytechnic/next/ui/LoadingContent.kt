@@ -23,15 +23,15 @@ fun LoadingContent(
     verticalArrangement: Arrangement.Vertical = Arrangement.Center,
     content: @Composable () -> Unit
 ) {
-    if (empty) emptyContent()
-    else {
-        PullToRefreshBox(
-            isRefreshing = loading, onRefresh = onRefresh
-        ) {
-            LazyColumn(Modifier.fillMaxSize(), verticalArrangement = verticalArrangement) {
-                item {
-                    content()
-                }
+    if (empty) {
+        emptyContent()
+        return
+    }
+
+    PullToRefreshBox(isRefreshing = loading, onRefresh = onRefresh) {
+        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = verticalArrangement) {
+            item {
+                content()
             }
         }
     }
@@ -44,7 +44,5 @@ fun FullScreenLoading() {
         modifier = Modifier
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
-    ) {
-        CircularProgressIndicator()
-    }
+    ) { CircularProgressIndicator() }
 }

@@ -37,7 +37,7 @@ import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
 import ru.n08i40k.polytechnic.next.network.data.profile.ChangeGroupRequest
 import ru.n08i40k.polytechnic.next.network.data.profile.ChangeGroupRequestData
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetGroupNamesRequest
+import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetGroupNamesReq
 
 private enum class ChangeGroupError {
     NOT_EXISTS
@@ -65,7 +65,7 @@ private fun getGroups(context: Context): ArrayList<String> {
     val groups = remember { arrayListOf(groupPlaceholder) }
 
     LaunchedEffect(groups) {
-        ScheduleGetGroupNamesRequest(context, {
+        ScheduleGetGroupNamesReq(context, {
             groups.clear()
             groups.addAll(it.names)
         }, {

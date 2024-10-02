@@ -10,8 +10,8 @@ import ru.n08i40k.polytechnic.next.network.data.profile.UsersMeRequest
 import ru.n08i40k.polytechnic.next.network.tryFuture
 
 class RemoteProfileRepository(private val context: Context) : ProfileRepository {
-    override suspend fun getProfile(): MyResult<Profile> {
-        return withContext(Dispatchers.IO) {
+    override suspend fun getProfile(): MyResult<Profile> =
+        withContext(Dispatchers.IO) {
             tryFuture {
                 UsersMeRequest(
                     context,
@@ -20,5 +20,4 @@ class RemoteProfileRepository(private val context: Context) : ProfileRepository 
                 )
             }
         }
-    }
 }

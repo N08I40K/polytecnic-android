@@ -15,7 +15,7 @@ class RegisterRequest(
     context,
     Method.POST,
     "auth/sign-up",
-    Response.Listener<String> { response -> listener.onResponse(Json.decodeFromString(response)) },
+    { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {
     override fun getBody(): ByteArray {

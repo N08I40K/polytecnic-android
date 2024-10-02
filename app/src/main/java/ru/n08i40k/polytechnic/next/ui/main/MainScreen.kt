@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,10 +32,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import ru.n08i40k.polytechnic.next.MainViewModel
+import ru.n08i40k.polytechnic.next.model.UserRole
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 import ru.n08i40k.polytechnic.next.ui.main.profile.ProfileScreen
+import ru.n08i40k.polytechnic.next.ui.main.replacer.ReplacerScreen
 import ru.n08i40k.polytechnic.next.ui.main.schedule.ScheduleScreen
+import ru.n08i40k.polytechnic.next.ui.model.ProfileUiState
 import ru.n08i40k.polytechnic.next.ui.model.ProfileViewModel
+import ru.n08i40k.polytechnic.next.ui.model.ScheduleReplacerViewModel
 import ru.n08i40k.polytechnic.next.ui.model.ScheduleViewModel
 import ru.n08i40k.polytechnic.next.ui.model.profileViewModel
 
@@ -43,13 +48,14 @@ import ru.n08i40k.polytechnic.next.ui.model.profileViewModel
 private fun NavHostContainer(
     navController: NavHostController,
     padding: PaddingValues,
-    scheduleViewModel: ScheduleViewModel
+    scheduleViewModel: ScheduleViewModel,
+    scheduleReplacerViewModel: ScheduleReplacerViewModel?
 ) {
     val context = LocalContext.current
 
     NavHost(
         navController = navController,
-        startDestination = Constants.bottomNavItem[1].route,
+        startDestination = "schedule",
         modifier = Modifier.padding(paddingValues = padding),
         enterTransition = {
             slideIn(
@@ -76,27 +82,36 @@ private fun NavHostContainer(
             composable("schedule") {
                 ScheduleScreen(scheduleViewModel) { scheduleViewModel.refreshGroup() }
             }
+
+            if (scheduleReplacerViewModel != null) {
+                composable("replacer") {
+                    ReplacerScreen(scheduleReplacerViewModel) { scheduleReplacerViewModel.refresh() }
+                }
+            }
         })
 }
 
 @Composable
-private fun BottomNavBar(navController: NavHostController) {
+private fun BottomNavBar(navController: NavHostController, isAdmin: Boolean) {
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
 
         val currentRoute = navBackStackEntry?.destination?.route
 
-        Constants.bottomNavItem.forEach { navItem ->
+        Constants.bottomNavItem.forEach {
+            if (it.isAdmin && !isAdmin)
+                return@forEach
+
             NavigationBarItem(
-                selected = navItem.route == currentRoute,
-                onClick = { if (navItem.route != currentRoute) navController.navigate(navItem.route) },
+                selected = it.route == currentRoute,
+                onClick = { if (it.route != currentRoute) navController.navigate(it.route) },
                 icon = {
                     Icon(
-                        imageVector = navItem.icon,
-                        contentDescription = stringResource(navItem.label)
+                        imageVector = it.icon,
+                        contentDescription = stringResource(it.label)
                     )
                 },
-                label = { Text(stringResource(navItem.label)) })
+                label = { Text(stringResource(it.label)) })
         }
     }
 }
@@ -126,14 +141,23 @@ fun MainScreen(
                 onUnauthorized = { appNavController.navigate("auth") })
         )
 
+    val profileUiState by LocalContext.current.profileViewModel!!.uiState.collectAsStateWithLifecycle()
+    val isAdmin = (profileUiState is ProfileUiState.HasProfile) &&
+            (profileUiState as ProfileUiState.HasProfile).profile.role == UserRole.ADMIN
+
+    val scheduleReplacerViewModel: ScheduleReplacerViewModel? =
+        if (isAdmin) hiltViewModel(LocalContext.current as ComponentActivity)
+        else null
+
     val navController = rememberNavController()
     Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) }
+        bottomBar = { BottomNavBar(navController, isAdmin) }
     ) { paddingValues ->
         NavHostContainer(
             navController,
             paddingValues,
-            scheduleViewModel
+            scheduleViewModel,
+            scheduleReplacerViewModel
         )
     }
 }
