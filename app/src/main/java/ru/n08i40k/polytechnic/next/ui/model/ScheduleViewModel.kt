@@ -1,6 +1,6 @@
 package ru.n08i40k.polytechnic.next.ui.model
 
-кimport androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
