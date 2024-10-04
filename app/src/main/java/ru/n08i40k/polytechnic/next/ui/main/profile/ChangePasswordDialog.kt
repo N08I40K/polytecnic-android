@@ -26,8 +26,7 @@ import com.android.volley.ClientError
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
-import ru.n08i40k.polytechnic.next.network.data.auth.ChangePasswordRequest
-import ru.n08i40k.polytechnic.next.network.data.auth.ChangePasswordRequestData
+import ru.n08i40k.polytechnic.next.network.request.auth.AuthChangePassword
 
 private enum class ChangePasswordError {
     INCORRECT_CURRENT_PASSWORD,
@@ -41,7 +40,7 @@ private fun tryChangePassword(
     onError: (ChangePasswordError) -> Unit,
     onSuccess: () -> Unit
 ) {
-    ChangePasswordRequest(ChangePasswordRequestData(oldPassword, newPassword), context, {
+    AuthChangePassword(AuthChangePassword.RequestDto(oldPassword, newPassword), context, {
         onSuccess()
     }, {
         if (it is ClientError && it.networkResponse.statusCode == 409)

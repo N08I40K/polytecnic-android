@@ -1,13 +1,14 @@
-package ru.n08i40k.polytechnic.next.network.data.profile
+package ru.n08i40k.polytechnic.next.network.request.profile
 
 import android.content.Context
 import com.android.volley.Response
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import ru.n08i40k.polytechnic.next.network.data.AuthorizedRequest
+import ru.n08i40k.polytechnic.next.network.request.AuthorizedRequest
 
-class ChangeUsernameRequest(
-    private val data: ChangeUsernameRequestData,
+class ProfileChangeUsername(
+    private val data: RequestDto,
     context: Context,
     listener: Response.Listener<Nothing>,
     errorListener: Response.ErrorListener?
@@ -15,9 +16,12 @@ class ChangeUsernameRequest(
     context,
     Method.POST,
     "users/change-username",
-    Response.Listener<String> { listener.onResponse(null) },
+    { listener.onResponse(null) },
     errorListener
 ) {
+    @Serializable
+    data class RequestDto(val username: String)
+
     override fun getBody(): ByteArray {
         return Json.encodeToString(data).toByteArray()
     }

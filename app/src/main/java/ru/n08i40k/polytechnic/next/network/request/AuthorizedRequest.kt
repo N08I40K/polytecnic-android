@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.network.data
+package ru.n08i40k.polytechnic.next.network.request
 
 import android.content.Context
 import com.android.volley.AuthFailureError
@@ -40,7 +40,7 @@ open class AuthorizedRequest(
             context.settingsDataStore.data.map { settings -> settings.accessToken }.first()
         }
 
-        if (accessToken.isEmpty())
+        if (accessToken.isEmpty() && context.profileViewModel != null)
             context.profileViewModel!!.onUnauthorized()
 
         val headers = super.getHeaders()

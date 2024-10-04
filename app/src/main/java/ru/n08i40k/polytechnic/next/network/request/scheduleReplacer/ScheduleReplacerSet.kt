@@ -1,10 +1,10 @@
-package ru.n08i40k.polytechnic.next.network.data.scheduleReplacer
+package ru.n08i40k.polytechnic.next.network.request.scheduleReplacer
 
 import android.content.Context
 import com.android.volley.Response
 import ru.n08i40k.polytechnic.next.network.AuthorizedMultipartRequest
 
-class ScheduleReplacerSetReq(
+class ScheduleReplacerSet(
     context: Context,
     private val fileName: String,
     private val fileData: ByteArray,

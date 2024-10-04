@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.data.schedule.impl
+package ru.n08i40k.polytechnic.next.data.scheduleReplacer.impl
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
@@ -6,15 +6,15 @@ import kotlinx.coroutines.withContext
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.data.scheduleReplacer.ScheduleReplacerRepository
 import ru.n08i40k.polytechnic.next.model.ScheduleReplacer
-import ru.n08i40k.polytechnic.next.network.data.scheduleReplacer.ScheduleReplacerClearReq
-import ru.n08i40k.polytechnic.next.network.data.scheduleReplacer.ScheduleReplacerGetReq
-import ru.n08i40k.polytechnic.next.network.data.scheduleReplacer.ScheduleReplacerSetReq
+import ru.n08i40k.polytechnic.next.network.request.scheduleReplacer.ScheduleReplacerClear
+import ru.n08i40k.polytechnic.next.network.request.scheduleReplacer.ScheduleReplacerGet
+import ru.n08i40k.polytechnic.next.network.request.scheduleReplacer.ScheduleReplacerSet
 import ru.n08i40k.polytechnic.next.network.tryFuture
 
 class RemoteScheduleReplacerRepository(private val context: Context) : ScheduleReplacerRepository {
     override suspend fun getAll(): MyResult<List<ScheduleReplacer>> =
         withContext(Dispatchers.IO) {
-            tryFuture { ScheduleReplacerGetReq(context, it, it) }
+            tryFuture { ScheduleReplacerGet(context, it, it) }
         }
 
 
@@ -24,12 +24,12 @@ class RemoteScheduleReplacerRepository(private val context: Context) : ScheduleR
         fileType: String
     ): MyResult<Nothing> =
         withContext(Dispatchers.IO) {
-            tryFuture { ScheduleReplacerSetReq(context, fileName, fileData, fileType, it, it) }
+            tryFuture { ScheduleReplacerSet(context, fileName, fileData, fileType, it, it) }
         }
 
     override suspend fun clear(): MyResult<Int> {
         val response = withContext(Dispatchers.IO) {
-            tryFuture { ScheduleReplacerClearReq(context, it, it) }
+            tryFuture { ScheduleReplacerClear(context, it, it) }
         }
 
         return when (response) {

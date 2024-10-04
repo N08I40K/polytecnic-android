@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.MockAppContainer
-import ru.n08i40k.polytechnic.next.data.schedule.impl.FakeScheduleReplacerRepository
+import ru.n08i40k.polytechnic.next.data.scheduleReplacer.impl.FakeScheduleReplacerRepository
 import ru.n08i40k.polytechnic.next.model.ScheduleReplacer
 import ru.n08i40k.polytechnic.next.ui.LoadingContent
 import ru.n08i40k.polytechnic.next.ui.model.ScheduleReplacerUiState

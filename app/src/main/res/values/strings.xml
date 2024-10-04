@@ -40,4 +40,9 @@
     <string name="bytes">bytes</string>
     <string name="clear_replacers">Clear</string>
     <string name="set_replacer">Set new</string>
+    <string name="schedule_channel_name">Schedule update</string>
+    <string name="schedule_channel_description">Inform when schedule has been updated</string>
+    <string name="schedule_update_title">Schedule has been updated.</string>
+    <string name="schedule_update_replaced">Schedule was updated by Administrator.</string>
+    <string name="schedule_update_default">Schedule was updated on polytechnic website.</string>
 </resources>

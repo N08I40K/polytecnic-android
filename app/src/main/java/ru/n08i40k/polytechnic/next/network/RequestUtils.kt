@@ -10,7 +10,9 @@ fun <ResultT, RequestT : RequestBase> tryFuture(
     buildRequest: (RequestFuture<ResultT>) -> RequestT
 ): MyResult<ResultT> {
     val future = RequestFuture.newFuture<ResultT>()
+
     buildRequest(future).send()
+
     return tryGet(future)
 }
 

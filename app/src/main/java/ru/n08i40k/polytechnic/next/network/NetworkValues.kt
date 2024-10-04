@@ -1,5 +1,5 @@
 package ru.n08i40k.polytechnic.next.network
 
 object NetworkValues {
-    const val API_HOST = "https://polytechnic.n08i40k.ru:5050/api/v1/"
+    const val API_HOST = "https://192.168.0.103:5050/api/v1/"
 }

@@ -59,11 +59,9 @@ import kotlinx.coroutines.runBlocking
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.model.UserRole
 import ru.n08i40k.polytechnic.next.model.UserRole.Companion.AcceptableUserRoles
-import ru.n08i40k.polytechnic.next.network.data.auth.LoginRequest
-import ru.n08i40k.polytechnic.next.network.data.auth.LoginRequestData
-import ru.n08i40k.polytechnic.next.network.data.auth.RegisterRequest
-import ru.n08i40k.polytechnic.next.network.data.auth.RegisterRequestData
-import ru.n08i40k.polytechnic.next.network.data.profile.UsersMeRequest
+import ru.n08i40k.polytechnic.next.network.request.auth.AuthLogin
+import ru.n08i40k.polytechnic.next.network.request.auth.AuthRegister
+import ru.n08i40k.polytechnic.next.network.request.profile.ProfileMe
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 
 @Preview(showBackground = true)
@@ -368,7 +366,7 @@ fun tryLogin(
 
     isLoading = true
 
-    LoginRequest(LoginRequestData(username, password), context, {
+    AuthLogin(AuthLogin.RequestDto(username, password), context, {
         runBlocking {
             context.settingsDataStore.updateData { currentSettings ->
                 currentSettings
@@ -379,7 +377,7 @@ fun tryLogin(
             }
         }
 
-        UsersMeRequest(context, {
+        ProfileMe(context, {
             scope.launch { snackbarHostState.showSnackbar("Cool!") }
 
             runBlocking {
@@ -437,8 +435,8 @@ fun tryRegister(
 
     isLoading = true
 
-    RegisterRequest(
-        RegisterRequestData(
+    AuthRegister(
+        AuthRegister.RequestDto(
             username,
             password,
             group,

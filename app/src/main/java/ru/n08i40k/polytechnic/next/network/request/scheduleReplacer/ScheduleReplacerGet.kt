@@ -1,13 +1,14 @@
-package ru.n08i40k.polytechnic.next.network.data.scheduleReplacer
+package ru.n08i40k.polytechnic.next.network.request.scheduleReplacer
 
 import android.content.Context
 import com.android.volley.Response
 import kotlinx.serialization.json.Json
-import ru.n08i40k.polytechnic.next.network.data.AuthorizedRequest
+import ru.n08i40k.polytechnic.next.model.ScheduleReplacer
+import ru.n08i40k.polytechnic.next.network.request.AuthorizedRequest
 
-class ScheduleReplacerGetReq(
+class ScheduleReplacerGet(
     context: Context,
-    listener: Response.Listener<ScheduleReplacerGetResData>,
+    listener: Response.Listener<List<ScheduleReplacer>>,
     errorListener: Response.ErrorListener?
 ) : AuthorizedRequest(
     context,

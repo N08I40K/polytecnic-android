@@ -1,13 +1,14 @@
-package ru.n08i40k.polytechnic.next.network.data.auth
+package ru.n08i40k.polytechnic.next.network.request.auth
 
 import android.content.Context
 import com.android.volley.Response
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import ru.n08i40k.polytechnic.next.network.data.AuthorizedRequest
+import ru.n08i40k.polytechnic.next.network.request.AuthorizedRequest
 
-class ChangePasswordRequest(
-    private val data: ChangePasswordRequestData,
+class AuthChangePassword(
+    private val data: RequestDto,
     context: Context,
     listener: Response.Listener<Nothing>,
     errorListener: Response.ErrorListener?
@@ -15,10 +16,13 @@ class ChangePasswordRequest(
     context,
     Method.POST,
     "auth/change-password",
-    Response.Listener<String> { listener.onResponse(null) },
+    { listener.onResponse(null) },
     errorListener,
     canBeUnauthorized = true
 ) {
+    @Serializable
+    data class RequestDto(val oldPassword: String, val newPassword: String)
+
     override fun getBody(): ByteArray {
         return Json.encodeToString(data).toByteArray()
     }

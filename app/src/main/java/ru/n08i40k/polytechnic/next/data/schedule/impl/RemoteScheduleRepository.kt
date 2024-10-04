@@ -9,14 +9,11 @@ import kotlinx.coroutines.withContext
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Group
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetReq
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetReqData
+import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleGet
 import ru.n08i40k.polytechnic.next.network.tryFuture
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 
 class RemoteScheduleRepository(private val context: Context) : ScheduleRepository {
-
-
     override suspend fun getGroup(): MyResult<Group> {
         return withContext(Dispatchers.IO) {
             val groupName = runBlocking {
@@ -27,8 +24,8 @@ class RemoteScheduleRepository(private val context: Context) : ScheduleRepositor
                 return@withContext MyResult.Failure(IllegalArgumentException("No group name provided!"))
 
             val response = tryFuture {
-                ScheduleGetReq(
-                    ScheduleGetReqData(groupName),
+                ScheduleGet(
+                    ScheduleGet.RequestDto(groupName),
                     context,
                     it,
                     it

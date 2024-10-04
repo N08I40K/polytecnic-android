@@ -40,4 +40,9 @@
     <string name="bytes">байт</string>
     <string name="clear_replacers">Удалить всё</string>
     <string name="set_replacer">Загрузить новое расписание</string>
+    <string name="schedule_channel_name">Обновления расписания</string>
+    <string name="schedule_channel_description">Информирует об обновлении расписания</string>
+    <string name="schedule_update_title">Расписание обновлено.</string>
+    <string name="schedule_update_replaced">Расписание было обновлено Администратором.</string>
+    <string name="schedule_update_default">Расписание было обновлено на сайте политехникума.</string>
 </resources>

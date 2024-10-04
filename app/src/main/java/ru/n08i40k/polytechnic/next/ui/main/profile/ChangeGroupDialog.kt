@@ -35,9 +35,8 @@ import com.android.volley.ClientError
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
-import ru.n08i40k.polytechnic.next.network.data.profile.ChangeGroupRequest
-import ru.n08i40k.polytechnic.next.network.data.profile.ChangeGroupRequestData
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetGroupNamesReq
+import ru.n08i40k.polytechnic.next.network.request.profile.ProfileChangeGroup
+import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleGetGroupNames
 
 private enum class ChangeGroupError {
     NOT_EXISTS
@@ -49,7 +48,7 @@ private fun tryChangeGroup(
     onError: (ChangeGroupError) -> Unit,
     onSuccess: (String) -> Unit
 ) {
-    ChangeGroupRequest(ChangeGroupRequestData(group), context, {
+    ProfileChangeGroup(ProfileChangeGroup.RequestDto(group), context, {
         onSuccess(group)
     }, {
         if (it is ClientError && it.networkResponse.statusCode == 404)
@@ -65,7 +64,7 @@ private fun getGroups(context: Context): ArrayList<String> {
     val groups = remember { arrayListOf(groupPlaceholder) }
 
     LaunchedEffect(groups) {
-        ScheduleGetGroupNamesReq(context, {
+        ScheduleGetGroupNames(context, {
             groups.clear()
             groups.addAll(it.names)
         }, {

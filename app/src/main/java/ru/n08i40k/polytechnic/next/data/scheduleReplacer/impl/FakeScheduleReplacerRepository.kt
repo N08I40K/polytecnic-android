@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.data.schedule.impl
+package ru.n08i40k.polytechnic.next.data.scheduleReplacer.impl
 
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.data.scheduleReplacer.ScheduleReplacerRepository

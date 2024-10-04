@@ -26,4 +26,8 @@ class FakeProfileRepository : ProfileRepository {
                 MyResult.Success(exampleProfile)
         }
     }
+
+    override suspend fun setFcmToken(token: String): MyResult<Unit> {
+        return MyResult.Success(Unit)
+    }
 }

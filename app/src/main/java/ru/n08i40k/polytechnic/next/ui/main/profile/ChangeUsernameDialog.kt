@@ -24,8 +24,7 @@ import com.android.volley.ClientError
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
-import ru.n08i40k.polytechnic.next.network.data.profile.ChangeUsernameRequest
-import ru.n08i40k.polytechnic.next.network.data.profile.ChangeUsernameRequestData
+import ru.n08i40k.polytechnic.next.network.request.profile.ProfileChangeUsername
 
 private enum class ChangeUsernameError {
     INCORRECT_LENGTH,
@@ -38,7 +37,7 @@ private fun tryChangeUsername(
     onError: (ChangeUsernameError) -> Unit,
     onSuccess: () -> Unit
 ) {
-    ChangeUsernameRequest(ChangeUsernameRequestData(username), context, {
+    ProfileChangeUsername(ProfileChangeUsername.RequestDto(username), context, {
         onSuccess()
     }, {
         if (it is ClientError && it.networkResponse.statusCode == 409)

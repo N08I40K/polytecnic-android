@@ -2,7 +2,7 @@ package ru.n08i40k.polytechnic.next.network
 
 import android.content.Context
 import com.android.volley.Response
-import ru.n08i40k.polytechnic.next.network.data.AuthorizedRequest
+import ru.n08i40k.polytechnic.next.network.request.AuthorizedRequest
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream

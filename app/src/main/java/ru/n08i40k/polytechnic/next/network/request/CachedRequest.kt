@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.network.data
+package ru.n08i40k.polytechnic.next.network.request
 
 import android.content.Context
 import com.android.volley.Response
@@ -11,10 +11,8 @@ import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.data.AppContainer
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.network.NetworkConnection
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetCacheStatusReq
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleGetCacheStatusResData
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleUpdateReq
-import ru.n08i40k.polytechnic.next.network.data.schedule.ScheduleUpdateReqData
+import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleGetCacheStatus
+import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleUpdate
 import ru.n08i40k.polytechnic.next.network.tryFuture
 import ru.n08i40k.polytechnic.next.network.tryGet
 import java.util.logging.Logger
@@ -58,14 +56,14 @@ open class CachedRequest(
         }
     }
 
-    private suspend fun updateMainPage(): MyResult<ScheduleGetCacheStatusResData> {
+    private suspend fun updateMainPage(): MyResult<ScheduleGetCacheStatus.ResponseDto> {
         return withContext(Dispatchers.IO) {
             when (val mainPage = getMainPage()) {
                 is MyResult.Failure -> mainPage
                 is MyResult.Success -> {
                     tryFuture {
-                        ScheduleUpdateReq(
-                            ScheduleUpdateReqData(mainPage.data),
+                        ScheduleUpdate(
+                            ScheduleUpdate.RequestDto(mainPage.data),
                             context,
                             it,
                             it
@@ -83,7 +81,7 @@ open class CachedRequest(
         logger.info("Getting cache status...")
 
         val cacheStatusResult = tryFuture {
-            ScheduleGetCacheStatusReq(context, it, it)
+            ScheduleGetCacheStatus(context, it, it)
         }
 
         if (cacheStatusResult is MyResult.Success) {
