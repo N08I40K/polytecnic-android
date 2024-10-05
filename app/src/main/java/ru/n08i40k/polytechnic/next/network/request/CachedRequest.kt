@@ -78,16 +78,12 @@ open class CachedRequest(
         val logger = Logger.getLogger("CachedRequest")
         val repository = appContainer.networkCacheRepository
 
-        logger.info("Getting cache status...")
-
         val cacheStatusResult = tryFuture {
             ScheduleGetCacheStatus(context, it, it)
         }
 
         if (cacheStatusResult is MyResult.Success) {
             val cacheStatus = cacheStatusResult.data
-
-            logger.info("Cache status received successfully!")
 
             runBlocking {
                 repository.setUpdateDates(
@@ -98,12 +94,10 @@ open class CachedRequest(
             }
 
             if (cacheStatus.cacheUpdateRequired) {
-                logger.info("Cache update was required!")
                 val updateResult = runBlocking { updateMainPage() }
 
                 when (updateResult) {
                     is MyResult.Success -> {
-                        logger.info("Cache update was successful!")
                         runBlocking {
                             repository.setUpdateDates(
                                 updateResult.data.lastCacheUpdate,
@@ -124,12 +118,10 @@ open class CachedRequest(
 
         val cachedResponse = runBlocking { repository.get(url) }
         if (cachedResponse != null) {
-            logger.info("Found cached response!")
             listener.onResponse(cachedResponse.data)
             return
         }
 
-        logger.info("Cached response doesn't exists!")
         super.send()
     }
 }

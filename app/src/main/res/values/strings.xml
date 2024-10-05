@@ -42,7 +42,13 @@
     <string name="set_replacer">Set new</string>
     <string name="schedule_channel_name">Schedule update</string>
     <string name="schedule_channel_description">Inform when schedule has been updated</string>
-    <string name="schedule_update_title">Schedule has been updated.</string>
+    <string name="schedule_update_title">Schedule has been updated!</string>
     <string name="schedule_update_replaced">Schedule was updated by Administrator.</string>
     <string name="schedule_update_default">Schedule was updated on polytechnic website.</string>
+    <string name="download_update">Download update</string>
+    <string name="telegram_channel">Telegram channel</string>
+    <string name="app_update_channel_name">Application update</string>
+    <string name="app_update_channel_description">Inform about new version of this app has been released</string>
+    <string name="app_update_title">Version %1$s released!</string>
+    <string name="app_update_description">Click to download new version.</string>
 </resources>

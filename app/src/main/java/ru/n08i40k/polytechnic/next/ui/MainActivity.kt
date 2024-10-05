@@ -1,13 +1,12 @@
 package ru.n08i40k.polytechnic.next.ui
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,43 +21,75 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import androidx.work.Worker
-import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import com.google.firebase.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import ru.n08i40k.polytechnic.next.NotificationChannels.SCHEDULE_UPDATE
+import ru.n08i40k.polytechnic.next.NotificationChannels
 import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
+import ru.n08i40k.polytechnic.next.work.FcmUpdateCallbackWorker
+import ru.n08i40k.polytechnic.next.work.LinkUpdateWorker
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @SuppressLint("ObsoleteSdkInt")
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.schedule_channel_name)
-            val description = getString(R.string.schedule_channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(SCHEDULE_UPDATE, name, importance)
-            channel.description = description
+    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
 
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
+    private val configSettings = remoteConfigSettings {
+        minimumFetchIntervalInSeconds = 3600
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
+    private fun createNotificationChannel(
+        notificationManager: NotificationManager,
+        name: String,
+        description: String,
+        channelId: String
     ) {
-        if (it) {
-            createNotificationChannel()
-        }
+        val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_DEFAULT)
+        channel.description = description
+
+        notificationManager.createNotificationChannel(channel)
     }
+
+    private fun createNotificationChannels() {
+        if (!hasNotificationPermission())
+            return
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        createNotificationChannel(
+            notificationManager,
+            getString(R.string.schedule_channel_name),
+            getString(R.string.schedule_channel_description),
+            NotificationChannels.SCHEDULE_UPDATE
+        )
+
+        createNotificationChannel(
+            notificationManager,
+            getString(R.string.app_update_channel_name),
+            getString(R.string.app_update_channel_description),
+            NotificationChannels.APP_UPDATE
+        )
+    }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) createNotificationChannels()
+        }
 
     private fun hasNotificationPermission(): Boolean {
         return (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
@@ -71,30 +102,59 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
-    class CacheUpdateWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
-        override fun doWork(): Result {
-            runBlocking {
-                (applicationContext as PolytechnicApplication)
-                    .container
-                    .scheduleRepository
-                    .getGroup()
-            }
-            return Result.success()
-        }
-    }
 
-    private fun schedulePeriodicRequest() {
+    fun scheduleLinkUpdate(intervalInMinutes: Long) {
+        val tag = "schedule-update"
+
         val workRequest = PeriodicWorkRequest.Builder(
-            CacheUpdateWorker::class.java,
-            15, TimeUnit.MINUTES
+            LinkUpdateWorker::class.java,
+            intervalInMinutes.coerceAtLeast(15), TimeUnit.MINUTES
         )
-            .addTag("schedule-update")
+            .addTag(tag)
             .build()
 
         val workManager = WorkManager.getInstance(applicationContext)
 
-        workManager.cancelAllWorkByTag("schedule-update")
+        workManager.cancelAllWorkByTag(tag)
         workManager.enqueue(workRequest)
+    }
+
+    private fun setupFirebaseConfig() {
+        remoteConfig.setConfigSettingsAsync(configSettings)
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+
+        remoteConfig
+            .fetchAndActivate()
+            .addOnCompleteListener {
+                if (!it.isSuccessful)
+                    Log.w("RemoteConfig", "Failed to fetch and activate!")
+
+                scheduleLinkUpdate(remoteConfig.getLong("linkUpdateDelay"))
+            }
+    }
+
+    private fun handleUpdate() {
+        lifecycleScope.launch {
+            val appVersion = (applicationContext as PolytechnicApplication).getAppVersion()
+
+            if (settingsDataStore.data.map { it.version }.first() != appVersion) {
+                settingsDataStore.updateData { it.toBuilder().setVersion(appVersion).build() }
+
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+
+                val request = OneTimeWorkRequestBuilder<FcmUpdateCallbackWorker>()
+                    .setConstraints(constraints)
+                    .setBackoffCriteria(BackoffPolicy.LINEAR, Duration.ofMinutes(1))
+                    .setInputData(workDataOf("VERSION" to appVersion))
+                    .build()
+
+                WorkManager
+                    .getInstance(this@MainActivity)
+                    .enqueue(request)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,11 +162,12 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
-        schedulePeriodicRequest()
         askNotificationPermission()
+        createNotificationChannels()
 
-        if (hasNotificationPermission())
-            createNotificationChannel()
+        setupFirebaseConfig()
+
+        handleUpdate()
 
         setContent {
             Box(Modifier.windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Top))) {

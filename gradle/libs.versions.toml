@@ -1,6 +1,6 @@
 [versions]
 accompanistSwiperefresh = "0.36.0"
-agp = "8.6.1"
+agp = "8.7.0"
 firebaseBom = "33.4.0"
 hiltAndroid = "2.52"
 hiltAndroidCompiler = "2.52"
@@ -18,9 +18,7 @@ protobufLite = "3.0.1"
 volley = "1.2.1"
 datastore = "1.1.1"
 navigationCompose = "2.8.2"
-firebaseCrashlytics = "19.2.0"
 googleFirebaseCrashlytics = "3.0.2"
-firebaseMessaging = "24.0.2"
 workRuntime = "2.9.1"
 
 [libraries]
@@ -29,8 +27,6 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -51,8 +47,11 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 protobuf-lite = { module = "com.google.protobuf:protobuf-lite", version.ref = "protobufLite" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
-firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

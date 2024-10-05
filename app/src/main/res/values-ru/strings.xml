@@ -42,7 +42,13 @@
     <string name="set_replacer">Загрузить новое расписание</string>
     <string name="schedule_channel_name">Обновления расписания</string>
     <string name="schedule_channel_description">Информирует об обновлении расписания</string>
-    <string name="schedule_update_title">Расписание обновлено.</string>
+    <string name="schedule_update_title">Расписание обновлено!</string>
     <string name="schedule_update_replaced">Расписание было обновлено Администратором.</string>
     <string name="schedule_update_default">Расписание было обновлено на сайте политехникума.</string>
+    <string name="download_update">Скачать обновление</string>
+    <string name="telegram_channel">Телеграм канал</string>
+    <string name="app_update_channel_name">Обновление приложения</string>
+    <string name="app_update_channel_description">Информирует о выходе новой версии этого приложения</string>
+    <string name="app_update_title">Вышла версия %1$s!</string>
+    <string name="app_update_description">Нажмите что бы загрузить обновление.</string>
 </resources>

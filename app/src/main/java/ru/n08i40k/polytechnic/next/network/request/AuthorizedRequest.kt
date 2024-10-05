@@ -30,7 +30,8 @@ open class AuthorizedRequest(
                         .setAccessToken("").build()
                 }
             }
-            context.profileViewModel!!.onUnauthorized()
+            if (context.profileViewModel != null)
+                context.profileViewModel!!.onUnauthorized()
         }
 
         errorListener?.onErrorResponse(it)
