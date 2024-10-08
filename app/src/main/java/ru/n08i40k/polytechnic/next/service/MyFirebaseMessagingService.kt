@@ -78,6 +78,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             }
 
             notify(id.hashCode(), notification)
+            CurrentLessonViewService.startService(applicationContext)
         }
     }
 

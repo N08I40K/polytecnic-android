@@ -3,8 +3,7 @@ package ru.n08i40k.polytechnic.next.ui
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.pm.PackageManager
-import android.os.Build
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.BackoffPolicy
@@ -39,6 +37,8 @@ import kotlinx.coroutines.launch
 import ru.n08i40k.polytechnic.next.NotificationChannels
 import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
+import ru.n08i40k.polytechnic.next.data.MyResult
+import ru.n08i40k.polytechnic.next.service.CurrentLessonViewService
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 import ru.n08i40k.polytechnic.next.work.FcmUpdateCallbackWorker
 import ru.n08i40k.polytechnic.next.work.LinkUpdateWorker
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun createNotificationChannels() {
-        if (!hasNotificationPermission())
+        if (!(applicationContext as PolytechnicApplication).hasNotificationPermission())
             return
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -84,6 +84,13 @@ class MainActivity : ComponentActivity() {
             getString(R.string.app_update_channel_description),
             NotificationChannels.APP_UPDATE
         )
+
+        createNotificationChannel(
+            notificationManager,
+            getString(R.string.lesson_view_channel_name),
+            getString(R.string.lesson_view_channel_description),
+            NotificationChannels.LESSON_VIEW
+        )
     }
 
     private val requestPermissionLauncher =
@@ -91,15 +98,30 @@ class MainActivity : ComponentActivity() {
             if (it) createNotificationChannels()
         }
 
-    private fun hasNotificationPermission(): Boolean {
-        return (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                || ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                == PackageManager.PERMISSION_GRANTED)
+    private fun askNotificationPermission() {
+        if (!(applicationContext as PolytechnicApplication).hasNotificationPermission())
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
-    private fun askNotificationPermission() {
-        if (!hasNotificationPermission())
-            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    private fun startTestService() {
+        if (!(applicationContext as PolytechnicApplication).hasNotificationPermission())
+            return
+
+        lifecycleScope.launch {
+            val schedule = (applicationContext as PolytechnicApplication)
+                .container
+                .scheduleRepository
+                .getGroup()
+
+            if (schedule is MyResult.Failure)
+                return@launch
+
+            val intent = Intent(this@MainActivity, CurrentLessonViewService::class.java)
+                .apply {
+                    putExtra("group", (schedule as MyResult.Success).data)
+                }
+            startForegroundService(intent)
+        }
     }
 
 
@@ -168,6 +190,7 @@ class MainActivity : ComponentActivity() {
         setupFirebaseConfig()
 
         handleUpdate()
+        startTestService()
 
         setContent {
             Box(Modifier.windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Top))) {

@@ -67,8 +67,8 @@ fun calculateCurrentLessonIdx(lessons: ArrayList<Lesson?>): Int {
         .filterNotNull()
         .filter {
             it.time != null
-                    && it.time.start >= currentMinutes
-                    && it.time.end <= currentMinutes
+                    && it.time.start <= currentMinutes
+                    && it.time.end >= currentMinutes
         }
 
     if (filteredLessons.isEmpty())

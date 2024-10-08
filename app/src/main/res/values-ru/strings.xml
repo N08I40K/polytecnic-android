@@ -51,4 +51,18 @@
     <string name="app_update_channel_description">Информирует о выходе новой версии этого приложения</string>
     <string name="app_update_title">Вышла версия %1$s!</string>
     <string name="app_update_description">Нажмите что бы загрузить обновление.</string>
+    <string name="lesson_view_channel_name">Текущая пара</string>
+    <string name="lesson_view_channel_description">Отображает текущую пару или перемену в уведомлении</string>
+    <string name="lesson_notification_title">Загрузка расписания…</string>
+    <string name="lesson_notification_description">Это уведомление обновится в течении нескольких секунд!</string>
+    <string name="lesson_going_notification_title">До конца %1$d ч. %2$d мин.</string>
+    <string name="lesson_going_notification_description">%1$s\n| Далее в %2$s - %3$s</string>
+    <string name="lessons_end">Конец пар</string>
+    <string name="lessons_end_notification_title">Пары закончились!</string>
+    <string name="lessons_end_notification_description">Ура, можно идти домой! Наверное :(</string>
+    <string name="cabinets_short_lc">каб.</string>
+    <string name="in_cabinets_short_lc">в %1$s каб.</string>
+    <string name="in_gym_lc">в спорт-зале</string>
+    <string name="lessons_not_started">Пары ещё не начались</string>
+    <string name="waiting_for_day_start_notification_title">До начала пар %1$d ч. %2$d мин.</string>
 </resources>

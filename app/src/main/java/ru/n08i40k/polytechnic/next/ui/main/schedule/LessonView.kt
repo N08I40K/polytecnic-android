@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -30,26 +31,20 @@ import ru.n08i40k.polytechnic.next.data.schedule.impl.FakeScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonTime
+import ru.n08i40k.polytechnic.next.utils.fmtAsClock
 
 private enum class LessonTimeFormat {
     FROM_TO, ONLY_MINUTES_DURATION
-}
-
-private fun numWithZero(num: Int): String {
-    return "0".repeat(if (num <= 9) 1 else 0) + num.toString()
 }
 
 @Composable
 private fun fmtTime(start: Int, end: Int, format: LessonTimeFormat): ArrayList<String> {
     return when (format) {
         LessonTimeFormat.FROM_TO -> {
-            val startHour = numWithZero(start / 60)
-            val startMinute = numWithZero(start % 60)
+            val startClock = start.fmtAsClock()
+            val endClock = end.fmtAsClock()
 
-            val endHour = numWithZero(end / 60)
-            val endMinute = numWithZero(end % 60)
-
-            arrayListOf("$startHour:$startMinute", "$endHour:$endMinute")
+            arrayListOf(startClock, endClock)
         }
 
         LessonTimeFormat.ONLY_MINUTES_DURATION -> {
@@ -86,13 +81,10 @@ fun LessonExtraInfo(
                     val duration =
                         if (lesson.time != null) lesson.time.end - lesson.time.start else 0
 
-                    val hours = duration / 60
-                    val minutes = duration % 60
-
-                    append(hours)
+                    append(duration / 60)
                     append(stringResource(R.string.hours))
                     append(" ")
-                    append(minutes)
+                    append(duration % 60)
                     append(stringResource(R.string.minutes))
                 }
                 Text(duration)
@@ -117,13 +109,18 @@ private fun LessonViewRow(
     time: LessonTime? = LessonTime(0, 60),
     timeFormat: LessonTimeFormat = LessonTimeFormat.FROM_TO,
     name: String = "Test",
-    teacherNames: ArrayList<String> = arrayListOf("Хомченко Н.Е.", "Хомченко Н.Е."),
+    teacherNames: ArrayList<String> = arrayListOf(
+        "Хомченко Н.Е. (1 подggggggggggggggggggggggggggggggggggggggгруппа)",
+        "Хомченко Н.Е. (2 подгруппа)"
+    ),
     cabinets: ArrayList<String> = arrayListOf("14", "31"),
     cardColors: CardColors = CardDefaults.cardColors(),
     verticalPadding: Dp = 10.dp
 ) {
     val contentColor =
         if (timeFormat == LessonTimeFormat.FROM_TO) cardColors.contentColor else cardColors.disabledContentColor
+
+    val teacherNamesRepl = teacherNames.map { it.replace("подгруппа", "подгр.") }
 
     Row(
         modifier = Modifier.padding(10.dp, verticalPadding),
@@ -164,15 +161,12 @@ private fun LessonViewRow(
         Column(
             verticalArrangement = Arrangement.Center
         ) {
-            val fraction = if (cabinets.size == 0) 1F
-            else if (cabinets.any { it.contains("/") }) 0.9F
-            else 0.925F
-
-
-            Row {
-                Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        modifier = Modifier.fillMaxWidth(fraction),
                         text = name,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
@@ -180,10 +174,9 @@ private fun LessonViewRow(
                         color = contentColor
                     )
 
-                    for (listIdx: Int in 0..<teacherNames.size) {
+                    for (teacherName in teacherNamesRepl) {
                         Text(
-                            modifier = Modifier.fillMaxWidth(fraction),
-                            text = teacherNames[listIdx],
+                            text = teacherName,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = contentColor
@@ -191,18 +184,15 @@ private fun LessonViewRow(
                     }
                 }
 
-                Column {
-                    if (cabinets.size <= teacherNames.size) {
+                Column(modifier = Modifier.wrapContentWidth()) {
+                    if (cabinets.size <= teacherNamesRepl.size) {
                         Text(
-                            modifier = Modifier.fillMaxWidth(),
                             text = "",
                             maxLines = 1
                         )
                     }
                     for (listIdx: Int in 0..<cabinets.size) {
-
                         Text(
-                            modifier = Modifier.fillMaxWidth(),
                             text = cabinets[listIdx],
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

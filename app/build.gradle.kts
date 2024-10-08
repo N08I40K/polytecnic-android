@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
 
     kotlin("plugin.serialization") version "2.0.20"
+    id("kotlin-parcelize")
 
     id("com.google.devtools.ksp")
 
@@ -32,8 +33,8 @@ android {
         applicationId = "ru.n08i40k.polytechnic.next"
         minSdk = 26
         targetSdk = 35
-        versionCode = 11
-        versionName = "1.6.0"
+        versionCode = 12
+        versionName = "1.7.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
