@@ -7,8 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -95,19 +96,25 @@ private fun NavHostContainer(
         enterTransition = {
             slideIn(
                 animationSpec = tween(
-                    500,
+                    400,
                     delayMillis = 250,
                     easing = LinearOutSlowInEasing
                 )
-            ) { fullSize -> IntOffset(-fullSize.width, 0) }
+            ) { fullSize -> IntOffset(0, fullSize.height / 16) } + fadeIn(
+                animationSpec = tween(
+                    400,
+                    delayMillis = 250,
+                    easing = LinearOutSlowInEasing
+                )
+            )
         },
         exitTransition = {
-            slideOut(
+            fadeOut(
                 animationSpec = tween(
-                    500,
+                    250,
                     easing = FastOutSlowInEasing
                 )
-            ) { fullSize -> IntOffset(fullSize.width, 0) }
+            )
         },
         builder = {
             composable("profile") {

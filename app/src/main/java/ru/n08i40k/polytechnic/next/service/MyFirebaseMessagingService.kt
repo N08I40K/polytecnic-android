@@ -20,6 +20,7 @@ import com.google.firebase.messaging.RemoteMessage
 import ru.n08i40k.polytechnic.next.NotificationChannels
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.work.FcmSetTokenWorker
+import ru.n08i40k.polytechnic.next.work.ScheduleClvAlarm
 import java.time.Duration
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -100,6 +101,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     NotificationCompat.PRIORITY_DEFAULT,
                     message.data["etag"]
                 )
+
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+
+                val request = OneTimeWorkRequestBuilder<ScheduleClvAlarm>()
+                    .setConstraints(constraints)
+                    .build()
+
+                WorkManager
+                    .getInstance(applicationContext)
+                    .enqueue(request)
             }
 
             "app-update" -> {

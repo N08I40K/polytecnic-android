@@ -1,5 +1,7 @@
 package ru.n08i40k.polytechnic.next.utils
 
+import java.util.Calendar
+
 infix fun <T> T?.or(data: T): T {
     if (this == null)
         return data
@@ -26,3 +28,6 @@ infix fun String.limit(count: Int): String {
         .trimEnd()
         .plus("…")
 }
+
+fun Calendar.getDayMinutes(): Int =
+    this.get(Calendar.HOUR_OF_DAY) * 60 + this.get(Calendar.MINUTE)

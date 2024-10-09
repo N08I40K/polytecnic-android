@@ -13,16 +13,14 @@ data class Lesson(
     val type: LessonType,
     val defaultIndex: Int,
     val name: String,
-    val time: LessonTime?,
+    val time: LessonTime,
     val cabinets: ArrayList<String>,
     val teacherNames: ArrayList<String>
 ) : Parcelable {
-    fun getDuration(): Int? {
-        if (this.time == null)
-            return null
-
-        return time.end - time.start
-    }
+    val duration: Int
+        get() {
+            return time.end - time.start
+        }
 
     fun getNameAndCabinetsShort(context: Context): String {
         val limitedName = name limit 15

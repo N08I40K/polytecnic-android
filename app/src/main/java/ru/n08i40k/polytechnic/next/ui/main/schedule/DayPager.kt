@@ -37,10 +37,10 @@ fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
                 val offset = pagerState.getOffsetDistanceInPages(page).absoluteValue
 
                 lerp(
-                    start = 0.95f, stop = 1f, fraction = 1f - offset.coerceIn(0f, 1f)
+                    start = 1f, stop = 0.95f, fraction = 1f - offset.coerceIn(0f, 1f)
                 ).also { scale ->
-                    scaleX = 1F - scale + 0.95F
-                    scaleY = 1F - scale + 0.95F
+                    scaleX = scale
+                    scaleY = scale
                 }
                 alpha = lerp(
                     start = 0.5f, stop = 1f, fraction = 1f - offset.coerceIn(0f, 1f)

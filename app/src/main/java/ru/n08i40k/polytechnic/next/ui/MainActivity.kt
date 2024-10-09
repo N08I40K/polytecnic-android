@@ -3,7 +3,6 @@ package ru.n08i40k.polytechnic.next.ui
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -38,7 +37,6 @@ import ru.n08i40k.polytechnic.next.NotificationChannels
 import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.MyResult
-import ru.n08i40k.polytechnic.next.service.CurrentLessonViewService
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 import ru.n08i40k.polytechnic.next.work.FcmUpdateCallbackWorker
 import ru.n08i40k.polytechnic.next.work.LinkUpdateWorker
@@ -103,10 +101,7 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
-    private fun startTestService() {
-        if (!(applicationContext as PolytechnicApplication).hasNotificationPermission())
-            return
-
+    private fun scheduleAlarm() {
         lifecycleScope.launch {
             val schedule = (applicationContext as PolytechnicApplication)
                 .container
@@ -116,11 +111,8 @@ class MainActivity : ComponentActivity() {
             if (schedule is MyResult.Failure)
                 return@launch
 
-            val intent = Intent(this@MainActivity, CurrentLessonViewService::class.java)
-                .apply {
-                    putExtra("group", (schedule as MyResult.Success).data)
-                }
-            startForegroundService(intent)
+            (applicationContext as PolytechnicApplication)
+                .scheduleClvService((schedule as MyResult.Success).data)
         }
     }
 
@@ -190,7 +182,7 @@ class MainActivity : ComponentActivity() {
         setupFirebaseConfig()
 
         handleUpdate()
-        startTestService()
+        scheduleAlarm()
 
         setContent {
             Box(Modifier.windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Top))) {

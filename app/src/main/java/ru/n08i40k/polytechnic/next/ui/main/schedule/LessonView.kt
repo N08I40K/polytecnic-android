@@ -79,7 +79,7 @@ fun LessonExtraInfo(
                     append(stringResource(R.string.lesson_duration))
                     append(" - ")
                     val duration =
-                        if (lesson.time != null) lesson.time.end - lesson.time.start else 0
+                        lesson.time.end - lesson.time.start
 
                     append(duration / 60)
                     append(stringResource(R.string.hours))
@@ -215,9 +215,7 @@ fun FreeLessonRow(
 ) {
     LessonViewRow(
         -1,
-        if (lesson.time != null && nextLesson.time != null) LessonTime(
-            lesson.time.end, nextLesson.time.start
-        ) else null,
+        LessonTime(lesson.time.end, nextLesson.time.start),
         LessonTimeFormat.ONLY_MINUTES_DURATION,
         stringResource(R.string.lesson_break),
         arrayListOf(),

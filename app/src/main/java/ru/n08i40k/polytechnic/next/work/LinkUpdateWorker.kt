@@ -17,7 +17,7 @@ class LinkUpdateWorker(context: Context, params: WorkerParameters) :
                 .getGroup()
         }
 
-        CurrentLessonViewService.startService(applicationContext)
+//        CurrentLessonViewService.startService(applicationContext)
 
         return Result.success()
     }

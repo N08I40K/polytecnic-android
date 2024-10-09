@@ -19,9 +19,11 @@ import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Group
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.utils.fmtAsClock
+import ru.n08i40k.polytechnic.next.utils.getDayMinutes
 import ru.n08i40k.polytechnic.next.work.StartClvService
 import java.util.Calendar
 
+@Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
 class CurrentLessonViewService : Service() {
     companion object {
         private const val NOTIFICATION_STATUS_ID = 1337
@@ -58,16 +60,16 @@ class CurrentLessonViewService : Service() {
                 .get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance()
                 .get(Calendar.MINUTE)
 
-            val currentLessonEntry = day!!.getCurrentLesson()
-            val currentLessonIdx: Int? = currentLessonEntry?.key
-            val currentLesson: Lesson? = currentLessonEntry?.value
+            val currentLessonEntry = day!!.currentKV
+            val currentLessonIdx: Int? = currentLessonEntry?.first
+            val currentLesson: Lesson? = currentLessonEntry?.second
 
-            val nextLessonEntry = day!!.getDistanceToNextByIdx(currentLessonIdx)
+            val nextLessonEntry = day!!.distanceToNextByIdx(currentLessonIdx)
             val nextLesson =
                 if (nextLessonEntry == null)
                     null
                 else
-                    day!!.lessons[nextLessonEntry.key]
+                    day!!.lessons[nextLessonEntry.first]
 
             if (currentLesson == null && nextLesson == null) {
                 val notification = NotificationCompat
@@ -83,13 +85,13 @@ class CurrentLessonViewService : Service() {
                 return
             }
 
-            val firstLessonIdx = day!!.getDistanceToNextByMinutes(0)?.key
+            val firstLessonIdx = day!!.distanceToNextByMinutes(0)?.first
                 ?: throw NullPointerException("Is this even real?")
             val distanceToFirst = day!!.lessons[firstLessonIdx]!!.time!!.start - currentMinutes
 
             val currentLessonDelay =
                 if (currentLesson == null) // Если эта пара - перемена, то конец перемены через (результат getDistanceToNext)
-                    nextLessonEntry!!.value
+                    nextLessonEntry!!.second
                 else // Если эта пара - обычная пара, то конец пары через (конец этой пары - текущее кол-во минут)
                     currentLesson.time!!.end - currentMinutes
 
@@ -157,32 +159,29 @@ class CurrentLessonViewService : Service() {
         return getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    fun updateSchedule(group: Group?): Boolean {
+    private fun updateSchedule(group: Group?): Boolean {
         if (group == null) {
             stopSelf()
             return false
         }
 
-        val day = group.getCurrentDay()
-        if (day?.value == null) {
+        val currentDay = group.current
+        if (currentDay == null || currentDay.nonNullIndices.isEmpty()) {
             stopSelf()
             return false
         }
 
-        val dayValue = day.value!!
-
         if (this.day == null) {
-            if (dayValue.lessons[dayValue.defaultIndices[dayValue.defaultIndices.lastIndex]]!!.time!!.end
-                <= Calendar.getInstance()
-                    .get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance()
-                    .get(Calendar.MINUTE)
-            ) {
+            val nowMinutes = Calendar.getInstance().getDayMinutes()
+
+            if (currentDay.first!!.time.start - nowMinutes > 30
+                || currentDay.last!!.time.end < nowMinutes) {
                 stopSelf()
                 return false
             }
         }
 
-        this.day = dayValue
+        this.day = currentDay
 
         this.handler.removeCallbacks(updateRunnable)
         updateRunnable.run()

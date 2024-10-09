@@ -66,9 +66,7 @@ fun calculateCurrentLessonIdx(lessons: ArrayList<Lesson?>): Int {
     val filteredLessons = lessons
         .filterNotNull()
         .filter {
-            it.time != null
-                    && it.time.start <= currentMinutes
-                    && it.time.end >= currentMinutes
+            it.time.start <= currentMinutes && it.time.end >= currentMinutes
         }
 
     if (filteredLessons.isEmpty())
@@ -101,16 +99,20 @@ fun DayCard(
         modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor =
-            if (current) MaterialTheme.colorScheme.surfaceContainerHighest
-            else MaterialTheme.colorScheme.surfaceContainerLowest
-        )
+            if (current) MaterialTheme.colorScheme.inverseSurface
+            else MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.inverseSurface)
     ) {
         if (day == null) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                text = stringResource(R.string.day_null)
+                text = stringResource(R.string.day_null),
+                color =
+                if (current) MaterialTheme.colorScheme.inverseOnSurface
+                else MaterialTheme.colorScheme.onSurface
             )
             return@Card
         }

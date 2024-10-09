@@ -2,10 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- bruh -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- For posting notifications from FCM and CLV services -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- For CLV service able to work -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <!-- For schedule CLV service-->
+    <!--    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".PolytechnicApplication"
@@ -17,6 +26,16 @@
         android:roundIcon="@drawable/ic_launcher_round"
         android:theme="@style/Theme.PolytechnicNext"
         tools:targetApi="35">
+
+        <receiver
+            android:name=".receiver.BootCompletedBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receiver.AlarmReceiver" />
 
         <service
             android:name=".service.MyFirebaseMessagingService"
