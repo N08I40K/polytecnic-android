@@ -36,7 +36,6 @@ import kotlinx.coroutines.launch
 import ru.n08i40k.polytechnic.next.NotificationChannels
 import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
-import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 import ru.n08i40k.polytechnic.next.work.FcmUpdateCallbackWorker
 import ru.n08i40k.polytechnic.next.work.LinkUpdateWorker
@@ -99,21 +98,6 @@ class MainActivity : ComponentActivity() {
     private fun askNotificationPermission() {
         if (!(applicationContext as PolytechnicApplication).hasNotificationPermission())
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-    }
-
-    private fun scheduleAlarm() {
-        lifecycleScope.launch {
-            val schedule = (applicationContext as PolytechnicApplication)
-                .container
-                .scheduleRepository
-                .getGroup()
-
-            if (schedule is MyResult.Failure)
-                return@launch
-
-            (applicationContext as PolytechnicApplication)
-                .scheduleClvService((schedule as MyResult.Success).data)
-        }
     }
 
 
@@ -182,7 +166,6 @@ class MainActivity : ComponentActivity() {
         setupFirebaseConfig()
 
         handleUpdate()
-        scheduleAlarm()
 
         setContent {
             Box(Modifier.windowInsetsPadding(WindowInsets.safeContent.only(WindowInsetsSides.Top))) {

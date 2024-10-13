@@ -27,3 +27,10 @@ fun <T> tryGet(future: RequestFuture<T>): MyResult<T> {
         MyResult.Failure(exception)
     }
 }
+
+fun unwrapException(exception: Exception): Throwable {
+    if (exception is ExecutionException && exception.cause != null)
+        return exception.cause!!
+    
+    return exception
+}

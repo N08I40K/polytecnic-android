@@ -33,8 +33,8 @@ android {
         applicationId = "ru.n08i40k.polytechnic.next"
         minSdk = 26
         targetSdk = 35
-        versionCode = 13
-        versionName = "1.7.1"
+        versionCode = 15
+        versionName = "1.8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

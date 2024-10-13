@@ -1,26 +1,14 @@
 package ru.n08i40k.polytechnic.next.ui.main.profile
 
 import android.content.Context
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +24,7 @@ import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
 import ru.n08i40k.polytechnic.next.network.request.profile.ProfileChangeGroup
-import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleGetGroupNames
+import ru.n08i40k.polytechnic.next.ui.widgets.GroupSelector
 
 private enum class ChangeGroupError {
     NOT_EXISTS
@@ -57,80 +45,6 @@ private fun tryChangeGroup(
     }).send()
 }
 
-@Composable
-private fun getGroups(context: Context): ArrayList<String> {
-    val groupPlaceholder = stringResource(R.string.loading)
-
-    val groups = remember { arrayListOf(groupPlaceholder) }
-
-    LaunchedEffect(groups) {
-        ScheduleGetGroupNames(context, {
-            groups.clear()
-            groups.addAll(it.names)
-        }, {
-            throw it
-        }).send()
-    }
-
-    return groups
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-private fun GroupSelector(
-    value: String = "ИС-214/24",
-    onValueChange: (String) -> Unit = {},
-    isError: Boolean = false,
-    readOnly: Boolean = false,
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier.wrapContentSize()
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
-                expanded = !readOnly && !expanded
-            }
-        ) {
-            TextField(
-                label = { Text(stringResource(R.string.group)) },
-                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
-                value = value,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Email,
-                        contentDescription = "group"
-                    )
-                },
-                onValueChange = {},
-                isError = isError,
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-            )
-
-            val context = LocalContext.current
-            val groups = getGroups(context)
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }) {
-                groups.forEach {
-                    DropdownMenuItem(
-                        text = { Text(it) },
-                        onClick = {
-                            onValueChange(it)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 internal fun ChangeGroupDialog(
@@ -141,7 +55,7 @@ internal fun ChangeGroupDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card {
-            var group by remember { mutableStateOf("ИС-214/23") }
+            var group by remember { mutableStateOf<String?>(profile.group) }
             var groupError by remember { mutableStateOf(false) }
 
             var processing by remember { mutableStateOf(false) }
@@ -165,7 +79,7 @@ internal fun ChangeGroupDialog(
 
                         tryChangeGroup(
                             context = context,
-                            group = group,
+                            group = group!!,
                             onError = {
                                 when (it) {
                                     ChangeGroupError.NOT_EXISTS -> {
@@ -178,7 +92,7 @@ internal fun ChangeGroupDialog(
                             onSuccess = onChange
                         )
                     },
-                    enabled = !(groupError || processing)
+                    enabled = !(groupError || processing) && group != null
                 ) {
                     Text(stringResource(R.string.change_group))
                 }

@@ -5,9 +5,10 @@ import com.android.volley.Response
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.n08i40k.polytechnic.next.model.UserRole
 import ru.n08i40k.polytechnic.next.network.RequestBase
 
-class AuthLogin(
+class AuthSignUp(
     private val data: RequestDto,
     context: Context,
     listener: Response.Listener<ResponseDto>,
@@ -15,12 +16,17 @@ class AuthLogin(
 ) : RequestBase(
     context,
     Method.POST,
-    "auth/sign-in",
+    "auth/sign-up",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {
     @Serializable
-    data class RequestDto(val username: String, val password: String)
+    data class RequestDto(
+        val username: String,
+        val password: String,
+        val group: String,
+        val role: UserRole
+    )
 
     @Serializable
     data class ResponseDto(val id: String, val accessToken: String)

@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.MockAppContainer
-import ru.n08i40k.polytechnic.next.ui.LoadingContent
+import ru.n08i40k.polytechnic.next.ui.widgets.LoadingContent
 import ru.n08i40k.polytechnic.next.ui.model.ScheduleUiState
 import ru.n08i40k.polytechnic.next.ui.model.ScheduleViewModel
 

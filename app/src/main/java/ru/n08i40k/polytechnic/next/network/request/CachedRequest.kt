@@ -26,7 +26,7 @@ open class CachedRequest(
     private val listener: Response.Listener<String>,
     errorListener: Response.ErrorListener?,
 ) : AuthorizedRequest(context, method, url, {
-    runBlocking {
+    runBlocking(Dispatchers.IO) {
         (context as PolytechnicApplication)
             .container.networkCacheRepository.put(url, it)
     }

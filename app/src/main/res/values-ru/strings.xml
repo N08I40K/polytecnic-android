@@ -3,10 +3,9 @@
     <string name="app_name">Политехникум</string>
     <string name="username">Имя пользователя</string>
     <string name="password">Пароль</string>
-    <string name="register">Зарегистрироваться</string>
-    <string name="login">Авторизоваться</string>
-    <string name="login_title">Авторизация</string>
-    <string name="register_title">Регистрация</string>
+    <string name="proceed">Продолжить</string>
+    <string name="sign_in_title">Авторизация</string>
+    <string name="sign_up_title">Регистрация</string>
     <string name="not_registered">Не зарегистрированы?</string>
     <string name="already_registered">Уже зарегистрированы?</string>
     <string name="reload">Перезагрузить</string>
@@ -23,7 +22,7 @@
     <string name="role_admin">Администратор</string>
     <string name="group">Группа</string>
     <string name="role">Роль</string>
-    <string name="day_null">Расписание ещё не обновилось.</string>
+    <string name="day_null">На этот день расписания ещё нет!</string>
     <string name="old_password">Старый пароль</string>
     <string name="new_password">Новый пароль</string>
     <string name="loading">Загрузка…</string>
@@ -65,4 +64,13 @@
     <string name="in_gym_lc">в спорт-зале</string>
     <string name="lessons_not_started">Пары ещё не начались</string>
     <string name="waiting_for_day_start_notification_title">До начала пар %1$d ч. %2$d мин.</string>
+    <string name="outdated_schedule">Вы просматриваете устаревшее расписание!</string>
+    <string name="invalid_credentials">Некорректное имя пользователя или пароль!</string>
+    <string name="timed_out">Неудалось отправить запрос, попробуйте позже!</string>
+    <string name="app_too_old">Пожалуйста обновите приложение!</string>
+    <string name="unknown_error">Произошла неизвестная ошибка! Попробуйте позже.</string>
+    <string name="failed_to_fetch_group_names">Не удалось получить список названий групп!</string>
+    <string name="already_exists">Пользователь с таким именем уже зарегистрирован!</string>
+    <string name="group_does_not_exists">Группа с таким названием не существует!</string>
+    <string name="no_connection">Нет подключения к интернету!</string>
 </resources>

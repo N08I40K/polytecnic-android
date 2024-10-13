@@ -33,23 +33,15 @@ import kotlinx.coroutines.flow.flow
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.schedule.impl.FakeScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Day
-import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonType
-import java.util.Calendar
-
-private fun getCurrentMinutes(): Int {
-    return Calendar.getInstance()
-        .get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance()
-        .get(Calendar.MINUTE)
-}
 
 @Composable
-private fun getMinutes(): Flow<Int> {
+private fun getCurrentLessonIdx(day: Day?): Flow<Int> {
     val value by remember {
         derivedStateOf {
             flow {
                 while (true) {
-                    emit(getCurrentMinutes())
+                    emit(day?.currentIdx ?: -1)
                     delay(5_000)
                 }
             }
@@ -57,22 +49,6 @@ private fun getMinutes(): Flow<Int> {
     }
 
     return value
-}
-
-@Composable
-fun calculateCurrentLessonIdx(lessons: ArrayList<Lesson?>): Int {
-    val currentMinutes by getMinutes().collectAsStateWithLifecycle(0)
-
-    val filteredLessons = lessons
-        .filterNotNull()
-        .filter {
-            it.time.start <= currentMinutes && it.time.end >= currentMinutes
-        }
-
-    if (filteredLessons.isEmpty())
-        return -1
-
-    return lessons.indexOf(filteredLessons[0])
 }
 
 @Preview(showBackground = true)
@@ -99,8 +75,8 @@ fun DayCard(
         modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor =
-            if (current) MaterialTheme.colorScheme.inverseSurface
-            else MaterialTheme.colorScheme.surface
+            if (current) MaterialTheme.colorScheme.primaryContainer
+            else MaterialTheme.colorScheme.secondaryContainer
         ),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.inverseSurface)
     ) {
@@ -109,14 +85,10 @@ fun DayCard(
                 modifier = Modifier.fillMaxWidth(),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                text = stringResource(R.string.day_null),
-                color =
-                if (current) MaterialTheme.colorScheme.inverseOnSurface
-                else MaterialTheme.colorScheme.onSurface
+                text = stringResource(R.string.day_null)
             )
             return@Card
         }
-
         Text(
             modifier = Modifier.fillMaxWidth(),
             fontWeight = FontWeight.Bold,
@@ -124,7 +96,8 @@ fun DayCard(
             text = day.name,
         )
 
-        val currentLessonIdx = calculateCurrentLessonIdx(day.lessons)
+        val currentLessonIdx by getCurrentLessonIdx(if (current) day else null)
+            .collectAsStateWithLifecycle(0)
 
         Column(
             modifier = Modifier.fillMaxWidth(),

@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.MockAppContainer
-import ru.n08i40k.polytechnic.next.ui.LoadingContent
+import ru.n08i40k.polytechnic.next.ui.widgets.LoadingContent
 import ru.n08i40k.polytechnic.next.ui.model.ProfileUiState
 import ru.n08i40k.polytechnic.next.ui.model.ProfileViewModel
 

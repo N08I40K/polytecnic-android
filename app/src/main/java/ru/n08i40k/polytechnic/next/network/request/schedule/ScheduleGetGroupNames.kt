@@ -4,13 +4,13 @@ import android.content.Context
 import com.android.volley.Response
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import ru.n08i40k.polytechnic.next.network.request.CachedRequest
+import ru.n08i40k.polytechnic.next.network.RequestBase
 
 class ScheduleGetGroupNames(
     context: Context,
     listener: Response.Listener<ResponseDto>,
     errorListener: Response.ErrorListener? = null
-) : CachedRequest(
+) : RequestBase(
     context,
     Method.GET,
     "schedule/get-group-names",

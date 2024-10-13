@@ -25,4 +25,11 @@ class ScheduleUpdate(
     override fun getBody(): ByteArray {
         return Json.encodeToString(data).toByteArray()
     }
+
+    override fun getHeaders(): MutableMap<String, String> {
+        val headers = super.getHeaders()
+        headers["version"] = "1"
+
+        return headers
+    }
 }

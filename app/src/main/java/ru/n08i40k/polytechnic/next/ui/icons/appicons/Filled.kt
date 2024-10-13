@@ -6,4 +6,4 @@ object FilledGroup
 
 @Suppress("UnusedReceiverParameter")
 val AppIcons.Filled: FilledGroup
-  get() = FilledGroup
+    get() = FilledGroup

@@ -116,21 +116,21 @@ private fun NavHostContainer(
                 )
             )
         },
-        builder = {
-            composable("profile") {
-                ProfileScreen(LocalContext.current.profileViewModel!!) { context.profileViewModel!!.refreshProfile() }
-            }
+    ) {
+        composable("profile") {
+            ProfileScreen(LocalContext.current.profileViewModel!!) { context.profileViewModel!!.refreshProfile() }
+        }
 
-            composable("schedule") {
-                ScheduleScreen(scheduleViewModel) { scheduleViewModel.refreshGroup() }
-            }
+        composable("schedule") {
+            ScheduleScreen(scheduleViewModel) { scheduleViewModel.refreshGroup() }
+        }
 
-            if (scheduleReplacerViewModel != null) {
-                composable("replacer") {
-                    ReplacerScreen(scheduleReplacerViewModel) { scheduleReplacerViewModel.refresh() }
-                }
+        if (scheduleReplacerViewModel != null) {
+            composable("replacer") {
+                ReplacerScreen(scheduleReplacerViewModel) { scheduleReplacerViewModel.refresh() }
             }
-        })
+        }
+    }
 }
 
 private fun openLink(context: Context, link: String) {
@@ -260,7 +260,11 @@ fun MainScreen(
         viewModel(
             factory = ProfileViewModel.provideFactory(
                 profileRepository = mainViewModel.appContainer.profileRepository,
-                onUnauthorized = { appNavController.navigate("auth") })
+                onUnauthorized = {
+                    appNavController.navigate("auth") {
+                        popUpTo("main") { inclusive = true }
+                    }
+                })
         )
     LocalContext.current.profileViewModel = profileViewModel
 

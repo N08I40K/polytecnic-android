@@ -24,4 +24,11 @@ class ScheduleGetCacheStatus(
         val lastCacheUpdate: Long,
         val lastScheduleUpdate: Long,
     )
+
+    override fun getHeaders(): MutableMap<String, String> {
+        val headers = super.getHeaders()
+        headers["version"] = "1"
+
+        return headers
+    }
 }

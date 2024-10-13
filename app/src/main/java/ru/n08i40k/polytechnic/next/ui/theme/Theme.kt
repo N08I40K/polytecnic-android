@@ -14,6 +14,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+@Immutable
+data class ExtendedColorScheme(
+    val warning: ColorFamily,
+)
+
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
@@ -242,6 +247,60 @@ private val highContrastDarkColorScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDarkHighContrast,
 )
 
+val extendedLight = ExtendedColorScheme(
+    warning = ColorFamily(
+        warningLight,
+        onWarningLight,
+        warningContainerLight,
+        onWarningContainerLight,
+    ),
+)
+
+val extendedDark = ExtendedColorScheme(
+    warning = ColorFamily(
+        warningDark,
+        onWarningDark,
+        warningContainerDark,
+        onWarningContainerDark,
+    ),
+)
+
+val extendedLightMediumContrast = ExtendedColorScheme(
+    warning = ColorFamily(
+        warningLightMediumContrast,
+        onWarningLightMediumContrast,
+        warningContainerLightMediumContrast,
+        onWarningContainerLightMediumContrast,
+    ),
+)
+
+val extendedLightHighContrast = ExtendedColorScheme(
+    warning = ColorFamily(
+        warningLightHighContrast,
+        onWarningLightHighContrast,
+        warningContainerLightHighContrast,
+        onWarningContainerLightHighContrast,
+    ),
+)
+
+val extendedDarkMediumContrast = ExtendedColorScheme(
+    warning = ColorFamily(
+        warningDarkMediumContrast,
+        onWarningDarkMediumContrast,
+        warningContainerDarkMediumContrast,
+        onWarningContainerDarkMediumContrast,
+    ),
+)
+
+val extendedDarkHighContrast = ExtendedColorScheme(
+    warning = ColorFamily(
+        warningDarkHighContrast,
+        onWarningDarkHighContrast,
+        warningContainerDarkHighContrast,
+        onWarningContainerDarkHighContrast,
+    ),
+)
+
 @Immutable
 data class ColorFamily(
     val color: Color,
@@ -255,11 +314,16 @@ val unspecified_scheme = ColorFamily(
 )
 
 @Composable
+fun extendedColorScheme(): ExtendedColorScheme {
+    return if (isSystemInDarkTheme()) extendedDark else extendedLight
+}
+
+@Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable() () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {

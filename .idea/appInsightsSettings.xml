@@ -15,8 +15,27 @@
                   <option name="projectNumber" value="946974192625" />
                 </ConnectionSetting>
               </option>
+              <option name="devices">
+                <list>
+                  <DeviceSetting>
+                    <option name="deviceType" value="Phone" />
+                    <option name="displayName" value="Xiaomi (2311DRK48G)" />
+                    <option name="manufacturer" value="Xiaomi" />
+                    <option name="model" value="2311DRK48G" />
+                  </DeviceSetting>
+                </list>
+              </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
+              <option name="versions">
+                <list>
+                  <VersionSetting>
+                    <option name="buildVersion" value="13" />
+                    <option name="displayName" value="1.7.1 (13)" />
+                    <option name="displayVersion" value="1.7.1" />
+                  </VersionSetting>
+                </list>
+              </option>
               <option name="visibilityType" value="ALL" />
             </InsightsFilterSettings>
           </value>

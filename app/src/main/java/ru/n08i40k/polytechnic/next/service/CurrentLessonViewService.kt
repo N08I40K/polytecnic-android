@@ -3,25 +3,24 @@ package ru.n08i40k.polytechnic.next.service
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.core.content.ContextCompat.startForegroundService
 import ru.n08i40k.polytechnic.next.NotificationChannels
 import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
+import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Group
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.utils.fmtAsClock
 import ru.n08i40k.polytechnic.next.utils.getDayMinutes
-import ru.n08i40k.polytechnic.next.work.StartClvService
 import java.util.Calendar
+import java.util.logging.Logger
 
 @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
 class CurrentLessonViewService : Service() {
@@ -30,19 +29,31 @@ class CurrentLessonViewService : Service() {
         private const val NOTIFICATION_END_ID = NOTIFICATION_STATUS_ID + 1
         private const val UPDATE_INTERVAL = 60_000L
 
-        fun startService(appContext: Context) {
-            if (!(appContext as PolytechnicApplication).hasNotificationPermission())
+        suspend fun startService(application: PolytechnicApplication) {
+            if (!application.hasNotificationPermission())
                 return
 
-            if (Calendar.getInstance()
-                    .get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance()
-                    .get(Calendar.MINUTE) < 420)
+            val schedule =
+                application
+                    .container
+                    .scheduleRepository
+                    .getGroup()
+
+            if (schedule is MyResult.Failure)
                 return
 
-            val request = OneTimeWorkRequestBuilder<StartClvService>()
-                .build()
+            val intent = Intent(application, CurrentLessonViewService::class.java)
+                .apply {
+                    putExtra("group", (schedule as MyResult.Success).data)
+                }
 
-            WorkManager.getInstance(appContext).enqueue(request)
+            application.stopService(
+                Intent(
+                    application,
+                    CurrentLessonViewService::class.java
+                )
+            )
+            startForegroundService(application, intent)
         }
     }
 
@@ -51,7 +62,10 @@ class CurrentLessonViewService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val updateRunnable = object : Runnable {
         override fun run() {
+            val logger = Logger.getLogger("CLV.updateRunnable")
+
             if (day == null || day!!.nonNullIndices.isEmpty()) {
+                logger.warning("Stopping, because day is null or empty!")
                 stopSelf()
                 return
             }
@@ -74,7 +88,7 @@ class CurrentLessonViewService : Service() {
             if (currentLesson == null && nextLesson == null) {
                 val notification = NotificationCompat
                     .Builder(applicationContext, NotificationChannels.LESSON_VIEW)
-                    .setSmallIcon(R.drawable.logo)
+                    .setSmallIcon(R.drawable.schedule)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setContentTitle(getString(R.string.lessons_end_notification_title))
                     .setContentText(getString(R.string.lessons_end_notification_description))
@@ -146,7 +160,7 @@ class CurrentLessonViewService : Service() {
     ): Notification {
         return NotificationCompat
             .Builder(applicationContext, NotificationChannels.LESSON_VIEW)
-            .setSmallIcon(R.drawable.logo)
+            .setSmallIcon(R.drawable.schedule)
             .setContentTitle(title ?: getString(R.string.lesson_notification_title))
             .setContentText(description ?: getString(R.string.lesson_notification_description))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -159,26 +173,29 @@ class CurrentLessonViewService : Service() {
         return getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private fun updateSchedule(group: Group?): Boolean {
+    private fun updateSchedule(group: Group?) {
+        val logger = Logger.getLogger("CLV")
+
         if (group == null) {
+            logger.warning("Stopping, because group is null")
             stopSelf()
-            return false
+            return
         }
 
         val currentDay = group.current
         if (currentDay == null || currentDay.nonNullIndices.isEmpty()) {
+            logger.warning("Stopping, because current day is null or empty")
             stopSelf()
-            return false
+            return
         }
 
-        if (this.day == null) {
-            val nowMinutes = Calendar.getInstance().getDayMinutes()
-
-            if (currentDay.first!!.time.start - nowMinutes > 30
-                || currentDay.last!!.time.end < nowMinutes) {
-                stopSelf()
-                return false
-            }
+        val nowMinutes = Calendar.getInstance().getDayMinutes()
+        if (nowMinutes < ((5 * 60) + 30)
+            || currentDay.last!!.time.end < nowMinutes
+        ) {
+            logger.warning("Stopping, because service started outside of acceptable time range!")
+            stopSelf()
+            return
         }
 
         this.day = currentDay
@@ -186,7 +203,7 @@ class CurrentLessonViewService : Service() {
         this.handler.removeCallbacks(updateRunnable)
         updateRunnable.run()
 
-        return true
+        logger.info("Running...")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -201,16 +218,14 @@ class CurrentLessonViewService : Service() {
         val notification = createNotification()
         startForeground(NOTIFICATION_STATUS_ID, notification)
 
-        if (!updateSchedule(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra("group", Group::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra("group")
-                }
-            )
+        updateSchedule(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra("group", Group::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra("group")
+            }
         )
-            updateRunnable.run()
 
         return START_STICKY
     }

@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.ui
+package ru.n08i40k.polytechnic.next.ui.widgets
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -31,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -39,9 +38,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ExpandableCard(
     modifier: Modifier = Modifier,
-    expanded: Boolean,
+    colors: CardColors = CardDefaults.cardColors(),
+    border: BorderStroke = BorderStroke(
+        Dp.Hairline,
+        MaterialTheme.colorScheme.inverseSurface
+    ),
+    expanded: Boolean = false,
     onExpandedChange: () -> Unit,
-    title: String,
+    title: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
     val transitionState = remember {
@@ -57,13 +61,32 @@ fun ExpandableCard(
             onExpandedChange()
             transitionState.targetState = expanded
         },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(Dp.Hairline, MaterialTheme.colorScheme.inverseSurface)
+        colors = colors,
+        border = border
     ) {
         Column {
             ExpandableCardHeader(title, transition)
             ExpandableCardContent(visible = expanded, content = content)
         }
+    }
+}
+
+@Composable
+fun ExpandableCard(
+    modifier: Modifier = Modifier,
+    title: @Composable () -> Unit,
+    colors: CardColors = CardDefaults.cardColors(),
+    border: BorderStroke = BorderStroke(
+        Dp.Hairline,
+        MaterialTheme.colorScheme.inverseSurface
+    ),
+) {
+    Card(
+        modifier = modifier,
+        colors = colors,
+        border = border
+    ) {
+        ExpandableCardHeader(title, null)
     }
 }
 
@@ -99,7 +122,7 @@ private fun ExpandableCardContent(
 }
 
 @Composable
-private fun ExpandableCardTitle(text: String) {
+fun ExpandableCardTitle(text: String) {
     Text(
         text = text,
         modifier = Modifier
@@ -130,8 +153,8 @@ private fun ExpandableCardArrow(
 
 @Composable
 private fun ExpandableCardHeader(
-    title: String = "TODO",
-    transition: Transition<Boolean>
+    title: @Composable () -> Unit,
+    transition: Transition<Boolean>?
 ) {
     Box(
         modifier = Modifier
@@ -139,7 +162,8 @@ private fun ExpandableCardHeader(
             .padding(10.dp, 0.dp),
         contentAlignment = Alignment.CenterEnd,
     ) {
-        ExpandableCardArrow(transition)
-        ExpandableCardTitle(title)
+        if (transition != null)
+            ExpandableCardArrow(transition)
+        title()
     }
 }

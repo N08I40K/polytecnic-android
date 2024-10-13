@@ -17,13 +17,19 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import ru.n08i40k.polytechnic.next.NotificationChannels
+import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.work.FcmSetTokenWorker
-import ru.n08i40k.polytechnic.next.work.ScheduleClvAlarm
 import java.time.Duration
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
+    val scope = CoroutineScope(Job() + Dispatchers.Main)
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
@@ -79,7 +85,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             }
 
             notify(id.hashCode(), notification)
-            CurrentLessonViewService.startService(applicationContext)
         }
     }
 
@@ -90,7 +95,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             "schedule-update" -> {
                 sendNotification(
                     NotificationChannels.SCHEDULE_UPDATE,
-                    R.drawable.logo,
+                    R.drawable.schedule,
                     getString(R.string.schedule_update_title),
                     getString(
                         if (message.data["replaced"] == "true")
@@ -101,24 +106,19 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     NotificationCompat.PRIORITY_DEFAULT,
                     message.data["etag"]
                 )
+            }
 
-                val constraints = Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-
-                val request = OneTimeWorkRequestBuilder<ScheduleClvAlarm>()
-                    .setConstraints(constraints)
-                    .build()
-
-                WorkManager
-                    .getInstance(applicationContext)
-                    .enqueue(request)
+            "lessons-start" -> {
+                scope.launch {
+                    CurrentLessonViewService
+                        .startService(applicationContext as PolytechnicApplication)
+                }
             }
 
             "app-update" -> {
                 sendNotification(
                     NotificationChannels.APP_UPDATE,
-                    R.drawable.logo,
+                    R.drawable.download,
                     getString(R.string.app_update_title, message.data["version"]),
                     getString(R.string.app_update_description),
                     NotificationCompat.PRIORITY_DEFAULT,

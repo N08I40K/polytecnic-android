@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.ui
+package ru.n08i40k.polytechnic.next.ui.widgets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

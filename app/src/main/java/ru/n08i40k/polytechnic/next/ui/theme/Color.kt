@@ -1,5 +1,4 @@
 package ru.n08i40k.polytechnic.next.ui.theme
-
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Color(0xFF4C662B)
@@ -218,9 +217,33 @@ val surfaceContainerDarkHighContrast = Color(0xFF1E201A)
 val surfaceContainerHighDarkHighContrast = Color(0xFF282B24)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF33362E)
 
+val warningLight = Color(0xFF7B580C)
+val onWarningLight = Color(0xFFFFFFFF)
+val warningContainerLight = Color(0xFFFFDEA8)
+val onWarningContainerLight = Color(0xFF271900)
 
+val warningLightMediumContrast = Color(0xFF593E00)
+val onWarningLightMediumContrast = Color(0xFFFFFFFF)
+val warningContainerLightMediumContrast = Color(0xFF946E24)
+val onWarningContainerLightMediumContrast = Color(0xFFFFFFFF)
 
+val warningLightHighContrast = Color(0xFF2F1F00)
+val onWarningLightHighContrast = Color(0xFFFFFFFF)
+val warningContainerLightHighContrast = Color(0xFF593E00)
+val onWarningContainerLightHighContrast = Color(0xFFFFFFFF)
 
+val warningDark = Color(0xFFEEBF6D)
+val onWarningDark = Color(0xFF422D00)
+val warningContainerDark = Color(0xFF5E4200)
+val onWarningContainerDark = Color(0xFFFFDEA8)
 
+val warningDarkMediumContrast = Color(0xFFF2C470)
+val onWarningDarkMediumContrast = Color(0xFF201400)
+val warningContainerDarkMediumContrast = Color(0xFFB38A3D)
+val onWarningContainerDarkMediumContrast = Color(0xFF000000)
 
+val warningDarkHighContrast = Color(0xFFFFFAF7)
+val onWarningDarkHighContrast = Color(0xFF000000)
+val warningContainerDarkHighContrast = Color(0xFFF2C470)
+val onWarningContainerDarkHighContrast = Color(0xFF000000)
 

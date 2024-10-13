@@ -1,3 +1,5 @@
+@file:Suppress("ObjectPropertyName", "UnusedReceiverParameter")
+
 package ru.n08i40k.polytechnic.next.ui.icons.appicons.filled
 
 import androidx.compose.ui.graphics.Color
@@ -11,14 +13,13 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 import ru.n08i40k.polytechnic.next.ui.icons.appicons.FilledGroup
 
-@Suppress("UnusedReceiverParameter")
 val FilledGroup.Download: ImageVector
     get() {
         if (_download != null) {
             return _download!!
         }
         _download = Builder(
-            name = "Download", defaultWidth = 24.0.dp, defaultHeight = 24.0.dp,
+            name = "Download", defaultWidth = 24.dp, defaultHeight = 24.dp,
             viewportWidth = 24.0f, viewportHeight = 24.0f
         ).apply {
             path(
@@ -55,5 +56,4 @@ val FilledGroup.Download: ImageVector
         return _download!!
     }
 
-@Suppress("ObjectPropertyName")
 private var _download: ImageVector? = null

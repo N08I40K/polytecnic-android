@@ -19,7 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.UpdateDates
-import ru.n08i40k.polytechnic.next.ui.ExpandableCard
+import ru.n08i40k.polytechnic.next.ui.widgets.ExpandableCard
+import ru.n08i40k.polytechnic.next.ui.widgets.ExpandableCardTitle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -49,7 +50,7 @@ fun UpdateInfo(
     ExpandableCard(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        title = stringResource(R.string.update_info_header)
+        title = { ExpandableCardTitle(stringResource(R.string.update_info_header)) }
     ) {
         Column(
             modifier = Modifier

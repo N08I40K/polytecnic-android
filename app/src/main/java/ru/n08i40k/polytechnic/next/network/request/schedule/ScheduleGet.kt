@@ -3,13 +3,11 @@ package ru.n08i40k.polytechnic.next.network.request.schedule
 import android.content.Context
 import com.android.volley.Response
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.n08i40k.polytechnic.next.model.Group
 import ru.n08i40k.polytechnic.next.network.request.CachedRequest
 
 class ScheduleGet(
-    private val data: RequestDto,
     context: Context,
     listener: Response.Listener<ResponseDto>,
     errorListener: Response.ErrorListener? = null
@@ -29,8 +27,4 @@ class ScheduleGet(
         val group: Group,
         val lastChangedDays: ArrayList<Int>,
     )
-
-    override fun getBody(): ByteArray {
-        return Json.encodeToString(data).toByteArray()
-    }
 }

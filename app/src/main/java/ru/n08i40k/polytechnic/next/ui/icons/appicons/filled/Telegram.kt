@@ -1,3 +1,5 @@
+@file:Suppress("ObjectPropertyName", "UnusedReceiverParameter")
+
 package ru.n08i40k.polytechnic.next.ui.icons.appicons.filled
 
 import androidx.compose.ui.graphics.Color
@@ -11,14 +13,13 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 import ru.n08i40k.polytechnic.next.ui.icons.appicons.FilledGroup
 
-@Suppress("UnusedReceiverParameter")
 val FilledGroup.Telegram: ImageVector
     get() {
         if (_telegram != null) {
             return _telegram!!
         }
         _telegram = Builder(
-            name = "Telegram", defaultWidth = 24.0.dp, defaultHeight = 24.0.dp,
+            name = "Telegram", defaultWidth = 24.dp, defaultHeight = 24.dp,
             viewportWidth = 24.0f, viewportHeight = 24.0f
         ).apply {
             path(
@@ -49,5 +50,4 @@ val FilledGroup.Telegram: ImageVector
         return _telegram!!
     }
 
-@Suppress("ObjectPropertyName")
 private var _telegram: ImageVector? = null

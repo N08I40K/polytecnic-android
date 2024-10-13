@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.runBlocking
+import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
@@ -187,6 +188,10 @@ internal fun ProfileCard(profile: Profile = FakeProfileRepository.exampleProfile
                                     context.settingsDataStore.updateData {
                                         it.toBuilder().setGroup(group).build()
                                     }
+                                    (context.applicationContext as PolytechnicApplication)
+                                        .container
+                                        .networkCacheRepository
+                                        .clear()
                                 }
                                 context.profileViewModel!!.refreshProfile {
                                     scheduleViewModel.refreshGroup()
