@@ -15,7 +15,7 @@ class ProfileChangeGroup(
 ) : AuthorizedRequest(
     context,
     Method.POST,
-    "users/change-group",
+    "v1/users/change-group",
     { listener.onResponse(null) },
     errorListener
 ) {

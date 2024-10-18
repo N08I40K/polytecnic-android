@@ -73,4 +73,7 @@
     <string name="already_exists">A user with this name is already registered!</string>
     <string name="group_does_not_exists">A group with this name does not exist!</string>
     <string name="no_connection">No internet connection!</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="tommorow">Tommorow</string>
 </resources>

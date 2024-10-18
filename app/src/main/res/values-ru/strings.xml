@@ -73,4 +73,7 @@
     <string name="already_exists">Пользователь с таким именем уже зарегистрирован!</string>
     <string name="group_does_not_exists">Группа с таким названием не существует!</string>
     <string name="no_connection">Нет подключения к интернету!</string>
+    <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
+    <string name="tommorow">Завтра</string>
 </resources>

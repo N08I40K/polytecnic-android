@@ -29,7 +29,12 @@ val FilledGroup.Download: ImageVector
             ) {
                 moveTo(3.0f, 12.3f)
                 verticalLineToRelative(7.0f)
-                arcToRelative(2.0f, 2.0f, 0.0f, false, false, 2.0f, 2.0f)
+                arcToRelative(2.0f, 2.0f, 0.0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = 2.0f,
+                    dy1 = 2.0f
+                )
                 horizontalLineTo(19.0f)
                 arcToRelative(2.0f, 2.0f, 0.0f, false, false, 2.0f, -2.0f)
                 verticalLineToRelative(-7.0f)

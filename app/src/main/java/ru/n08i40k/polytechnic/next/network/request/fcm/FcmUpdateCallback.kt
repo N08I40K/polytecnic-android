@@ -11,7 +11,7 @@ class FcmUpdateCallback(
     errorListener: Response.ErrorListener?,
 ) : AuthorizedRequest(
     context, Method.POST,
-    "fcm/update-callback/$version",
+    "v1/fcm/update-callback/$version",
     { listener.onResponse(Unit) },
     errorListener,
     true

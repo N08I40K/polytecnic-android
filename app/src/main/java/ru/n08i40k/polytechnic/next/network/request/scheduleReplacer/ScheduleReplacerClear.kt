@@ -13,7 +13,7 @@ class ScheduleReplacerClear(
 ) : AuthorizedRequest(
     context,
     Method.POST,
-    "schedule-replacer/clear",
+    "v1/schedule-replacer/clear",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {

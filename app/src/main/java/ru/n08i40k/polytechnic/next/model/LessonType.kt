@@ -11,5 +11,7 @@ private class LessonTypeIntSerializer : EnumAsIntSerializer<LessonType>(
 
 @Serializable(with = LessonTypeIntSerializer::class)
 enum class LessonType(val value: Int) {
-    DEFAULT(0), CUSTOM(1)
+    DEFAULT(0),
+    ADDITIONAL(1),
+    BREAK(2)
 }

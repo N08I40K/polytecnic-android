@@ -4,6 +4,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Day
@@ -11,6 +15,25 @@ import ru.n08i40k.polytechnic.next.model.Group
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonTime
 import ru.n08i40k.polytechnic.next.model.LessonType
+import ru.n08i40k.polytechnic.next.model.SubGroup
+import ru.n08i40k.polytechnic.next.utils.now
+
+private fun genLocalDateTime(hour: Int, minute: Int): Instant {
+    return LocalDateTime(2024, 1, 1, hour, minute, 0, 0).toInstant(TimeZone.currentSystemDefault())
+}
+
+private fun genBreak(start: Instant, end: Instant): Lesson {
+    return Lesson(
+        type = LessonType.BREAK,
+        defaultRange = null,
+        name = null,
+        time = LessonTime(
+            start,
+            end
+        ),
+        subGroups = listOf()
+    )
+}
 
 class FakeScheduleRepository : ScheduleRepository {
     @Suppress("SpellCheckingInspection")
@@ -19,132 +42,102 @@ class FakeScheduleRepository : ScheduleRepository {
             name = "ИС-214/23", days = arrayListOf(
                 Day(
                     name = "Понедельник",
-                    nonNullIndices = arrayListOf(0, 1, 2, 3, 4, 5),
-                    defaultIndices = arrayListOf(2, 3, 4, 5),
-                    customIndices = arrayListOf(0, 1),
-                    lessons = arrayListOf(
+                    date = LocalDateTime.now().toInstant(TimeZone.currentSystemDefault()),
+                    lessons = listOf(
                         Lesson(
-                            type = LessonType.CUSTOM,
-                            defaultIndex = -1,
+                            type = LessonType.ADDITIONAL,
+                            defaultRange = null,
                             name = "Линейка",
-                            time = LessonTime(510, 520),
-                            cabinets = arrayListOf(),
-                            teacherNames = arrayListOf(),
+                            time = LessonTime(
+                                genLocalDateTime(8, 30),
+                                genLocalDateTime(8, 40),
+                            ),
+                            subGroups = listOf()
+                        ),
+                        genBreak(
+                            genLocalDateTime(8, 40),
+                            genLocalDateTime(8, 45),
                         ),
                         Lesson(
-                            type = LessonType.CUSTOM,
-                            defaultIndex = -1,
+                            type = LessonType.ADDITIONAL,
+                            defaultRange = null,
                             name = "Разговор о важном",
-                            time = LessonTime(525, 555),
-                            cabinets = arrayListOf(),
-                            teacherNames = arrayListOf(),
+                            time = LessonTime(
+                                genLocalDateTime(8, 45),
+                                genLocalDateTime(9, 15),
+                            ),
+                            subGroups = listOf()
+                        ),
+                        genBreak(
+                            genLocalDateTime(9, 15),
+                            genLocalDateTime(9, 25),
                         ),
                         Lesson(
                             type = LessonType.DEFAULT,
-                            defaultIndex = 1,
-                            name = "Элементы высшей математики",
-                            time = LessonTime(565, 645),
-                            cabinets = arrayListOf("31", "12"),
-                            teacherNames = arrayListOf("Цацаева Т.Н."),
-                        ),
-                        Lesson(
-                            type = LessonType.DEFAULT,
-                            defaultIndex = 2,
-                            name = "Операционные системы и среды",
-                            time = LessonTime(655, 735),
-                            cabinets = arrayListOf("42", "52"),
-                            teacherNames = arrayListOf("Сергачева А.О.", "Не Сергачева А.О."),
-                        ),
-                        Lesson(
-                            type = LessonType.DEFAULT,
-                            defaultIndex = 3,
-                            name = "Физическая культура",
-                            time = LessonTime(755, 835),
-                            cabinets = arrayListOf("c/3"),
-                            teacherNames = arrayListOf("Васюнин В.Г.", "Не Васюнин В.Г."),
-                        ),
-                        Lesson(
-                            type = LessonType.DEFAULT,
-                            defaultIndex = 4,
+                            defaultRange = listOf(1, 1),
                             name = "МДК.05.01 Проектирование и дизайн информационных систем",
-                            time = LessonTime(845, 925),
-                            cabinets = arrayListOf("43"),
-                            teacherNames = arrayListOf("Ивашова А.Н."),
+                            time = LessonTime(
+                                genLocalDateTime(9, 25),
+                                genLocalDateTime(10, 45),
+                            ),
+                            subGroups = listOf(
+                                SubGroup(
+                                    teacher = "Ивашова А.Н.",
+                                    number = 1,
+                                    cabinet = "43"
+                                )
+                            )
                         ),
-                        null,
-                        null,
-                    )
-                ), Day(
-                    name = "Вторник",
-                    nonNullIndices = arrayListOf(0, 1, 2),
-                    defaultIndices = arrayListOf(0, 1, 2),
-                    customIndices = arrayListOf(),
-                    lessons = arrayListOf(
-                        Lesson(
-                            type = LessonType.DEFAULT,
-                            defaultIndex = 1,
-                            name = "Стандартизация, сертификация и техническое документоведение",
-                            time = LessonTime(525, 605),
-                            cabinets = arrayListOf("42"),
-                            teacherNames = arrayListOf("Сергачева А.О."),
+                        genBreak(
+                            genLocalDateTime(10, 45),
+                            genLocalDateTime(10, 55),
                         ),
                         Lesson(
                             type = LessonType.DEFAULT,
-                            defaultIndex = 2,
-                            name = "Элементы высшей математики",
-                            time = LessonTime(620, 700),
-                            cabinets = arrayListOf("31"),
-                            teacherNames = arrayListOf("Цацаева Т.Н."),
-                        ),
-                        Lesson(
-                            type = LessonType.DEFAULT,
-                            defaultIndex = 3,
+                            defaultRange = listOf(2, 2),
                             name = "Основы проектирования баз данных",
-                            time = LessonTime(720, 800),
-                            cabinets = arrayListOf("21"),
-                            teacherNames = arrayListOf("Чинарева Е.А."),
+                            time = LessonTime(
+                                genLocalDateTime(10, 55),
+                                genLocalDateTime(12, 15),
+                            ),
+                            subGroups = listOf(
+                                SubGroup(
+                                    teacher = "Чинарева Е.А.",
+                                    number = 1,
+                                    cabinet = "21"
+                                ),
+                                SubGroup(
+                                    teacher = "Ивашова А.Н.",
+                                    number = 2,
+                                    cabinet = "44"
+                                ),
+                            )
                         ),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                    )
-                ), Day(
-                    name = "Среда",
-                    nonNullIndices = arrayListOf(0, 1, 2),
-                    defaultIndices = arrayListOf(0, 1, 2),
-                    customIndices = arrayListOf(),
-                    lessons = arrayListOf(
+                        genBreak(
+                            genLocalDateTime(12, 15),
+                            genLocalDateTime(12, 35),
+                        ),
                         Lesson(
                             type = LessonType.DEFAULT,
-                            defaultIndex = 1,
+                            defaultRange = listOf(3, 3),
                             name = "Операционные системы и среды",
-                            time = LessonTime(525, 605),
-                            cabinets = arrayListOf("42"),
-                            teacherNames = arrayListOf("Сергачева А.О."),
+                            time = LessonTime(
+                                genLocalDateTime(12, 35),
+                                genLocalDateTime(13, 55),
+                            ),
+                            subGroups = listOf(
+                                SubGroup(
+                                    teacher = "Сергачева А.О.",
+                                    number = 1,
+                                    cabinet = "42"
+                                ),
+                                SubGroup(
+                                    teacher = "Воронцева Н.В.",
+                                    number = 2,
+                                    cabinet = "41"
+                                ),
+                            )
                         ),
-                        Lesson(
-                            type = LessonType.DEFAULT,
-                            defaultIndex = 2,
-                            name = "Элементы высшей математики",
-                            time = LessonTime(620, 700),
-                            cabinets = arrayListOf("31"),
-                            teacherNames = arrayListOf("Цацаева Т.Н."),
-                        ),
-                        Lesson(
-                            type = LessonType.DEFAULT,
-                            defaultIndex = 3,
-                            name = "МДК.05.01 Проектирование и дизайн информационных систем",
-                            time = LessonTime(720, 800),
-                            cabinets = arrayListOf("43"),
-                            teacherNames = arrayListOf("Ивашова А.Н."),
-                        ),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
                     )
                 )
             )

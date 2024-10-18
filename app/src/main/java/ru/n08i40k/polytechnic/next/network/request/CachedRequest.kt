@@ -16,8 +16,7 @@ import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleUpdate
 import ru.n08i40k.polytechnic.next.network.tryFuture
 import ru.n08i40k.polytechnic.next.network.tryGet
 import java.util.logging.Logger
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
+import java.util.regex.Pattern
 
 open class CachedRequest(
     context: Context,
@@ -34,36 +33,43 @@ open class CachedRequest(
 }, errorListener) {
     private val appContainer: AppContainer = (context as PolytechnicApplication).container
 
-    @OptIn(ExperimentalEncodingApi::class)
-    suspend fun getMainPage(): MyResult<String> {
-        return withContext(Dispatchers.IO) {
-            val mainPageFuture = RequestFuture.newFuture<String>()
-            val request = StringRequest(
-                Method.GET,
-                "https://politehnikum-eng.ru/index/raspisanie_zanjatij/0-409",
-                mainPageFuture,
-                mainPageFuture
-            )
-            NetworkConnection.getInstance(context).addToRequestQueue(request)
-
-            when (val response = tryGet(mainPageFuture)) {
-                is MyResult.Failure -> response
-                is MyResult.Success -> {
-                    val encodedMainPage = Base64.Default.encode(response.data.encodeToByteArray())
-                    MyResult.Success(encodedMainPage)
-                }
-            }
-        }
+    companion object {
+        private const val REGEX: String = "<a href=\"(/\\d{4}/[\\w\\-_]+\\.xls)\">"
+        val pattern: Pattern = Pattern.compile(REGEX, Pattern.MULTILINE)
     }
+
+    private suspend fun getXlsUrl(): MyResult<String> = withContext(Dispatchers.IO) {
+        val mainPageFuture = RequestFuture.newFuture<String>()
+        val request = StringRequest(
+            Method.GET,
+            "https://politehnikum-eng.ru/index/raspisanie_zanjatij/0-409",
+            mainPageFuture,
+            mainPageFuture
+        )
+        NetworkConnection.getInstance(context).addToRequestQueue(request)
+
+        val response = tryGet(mainPageFuture)
+        if (response is MyResult.Failure)
+            return@withContext response
+
+        val pageData = (response as MyResult.Success).data
+
+        val matcher = pattern.matcher(pageData)
+        if (!matcher.find())
+            return@withContext MyResult.Failure(RuntimeException("Required url not found!"))
+
+        MyResult.Success("https://politehnikum-eng.ru" + matcher.group(1))
+    }
+
 
     private suspend fun updateMainPage(): MyResult<ScheduleGetCacheStatus.ResponseDto> {
         return withContext(Dispatchers.IO) {
-            when (val mainPage = getMainPage()) {
-                is MyResult.Failure -> mainPage
+            when (val xlsUrl = getXlsUrl()) {
+                is MyResult.Failure -> xlsUrl
                 is MyResult.Success -> {
                     tryFuture {
                         ScheduleUpdate(
-                            ScheduleUpdate.RequestDto(mainPage.data),
+                            ScheduleUpdate.RequestDto(xlsUrl.data),
                             context,
                             it,
                             it

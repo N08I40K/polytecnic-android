@@ -13,7 +13,7 @@ class ScheduleReplacerGet(
 ) : AuthorizedRequest(
     context,
     Method.GET,
-    "schedule-replacer/get",
+    "v1/schedule-replacer/get",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 )

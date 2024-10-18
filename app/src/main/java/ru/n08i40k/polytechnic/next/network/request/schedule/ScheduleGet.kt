@@ -13,8 +13,8 @@ class ScheduleGet(
     errorListener: Response.ErrorListener? = null
 ) : CachedRequest(
     context,
-    Method.POST,
-    "schedule/get-group",
+    Method.GET,
+    "v2/schedule/group",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {
@@ -25,6 +25,6 @@ class ScheduleGet(
     data class ResponseDto(
         val updatedAt: String,
         val group: Group,
-        val lastChangedDays: ArrayList<Int>,
+        val updated: ArrayList<Int>,
     )
 }

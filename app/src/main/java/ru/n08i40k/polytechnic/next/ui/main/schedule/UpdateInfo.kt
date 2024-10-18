@@ -1,5 +1,6 @@
 package ru.n08i40k.polytechnic.next.ui.main.schedule
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,10 +54,16 @@ fun UpdateInfo(
         onExpandedChange = { expanded = !expanded },
         title = { ExpandableCardTitle(stringResource(R.string.update_info_header)) }
     ) {
+        var paskhalkoCounter by remember { mutableIntStateOf(0) }
+
+        if (paskhalkoCounter >= 10)
+            PaskhalkoDialog()
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
+                .clickable { ++paskhalkoCounter }
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,

@@ -13,7 +13,13 @@ class FakeProfileRepository : ProfileRepository {
 
     companion object {
         val exampleProfile =
-            Profile("66db32d24030a07e02d974c5", "n08i40k", "ИС-214/23", UserRole.STUDENT)
+            Profile(
+                "66db32d24030a07e02d974c5",
+                "128735612876",
+                "n08i40k",
+                "ИС-214/23",
+                UserRole.STUDENT
+            )
     }
 
     override suspend fun getProfile(): MyResult<Profile> {

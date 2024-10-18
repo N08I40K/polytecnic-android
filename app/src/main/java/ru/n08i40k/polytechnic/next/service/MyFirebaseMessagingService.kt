@@ -28,7 +28,7 @@ import ru.n08i40k.polytechnic.next.work.FcmSetTokenWorker
 import java.time.Duration
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-    val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -53,7 +53,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         @DrawableRes iconId: Int,
         title: String,
         contentText: String,
-        priority: Int,
         id: Any?,
         intent: Intent? = null
     ) {
@@ -70,7 +69,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setSmallIcon(iconId)
             .setContentTitle(title)
             .setContentText(contentText)
-            .setPriority(priority)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()
@@ -103,7 +102,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         else
                             R.string.schedule_update_default
                     ),
-                    NotificationCompat.PRIORITY_DEFAULT,
                     message.data["etag"]
                 )
             }
@@ -121,7 +119,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     R.drawable.download,
                     getString(R.string.app_update_title, message.data["version"]),
                     getString(R.string.app_update_description),
-                    NotificationCompat.PRIORITY_DEFAULT,
                     message.data["version"],
                     Intent(Intent.ACTION_VIEW, Uri.parse(message.data["downloadLink"]))
                 )

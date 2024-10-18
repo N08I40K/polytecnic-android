@@ -14,22 +14,13 @@ class ScheduleUpdate(
     errorListener: Response.ErrorListener? = null
 ) : AuthorizedRequest(
     context,
-    Method.POST,
-    "schedule/update-site-main-page",
+    Method.PATCH,
+    "v2/schedule/update-download-url",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {
     @Serializable
-    data class RequestDto(val mainPage: String)
+    data class RequestDto(val url: String)
 
-    override fun getBody(): ByteArray {
-        return Json.encodeToString(data).toByteArray()
-    }
-
-    override fun getHeaders(): MutableMap<String, String> {
-        val headers = super.getHeaders()
-        headers["version"] = "1"
-
-        return headers
-    }
+    override fun getBody(): ByteArray = Json.encodeToString(data).toByteArray()
 }

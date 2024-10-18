@@ -15,7 +15,7 @@ class ProfileChangeUsername(
 ) : AuthorizedRequest(
     context,
     Method.POST,
-    "users/change-username",
+    "v1/users/change-username",
     { listener.onResponse(null) },
     errorListener
 ) {

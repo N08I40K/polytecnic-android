@@ -13,7 +13,7 @@ class ScheduleGetGroupNames(
 ) : RequestBase(
     context,
     Method.GET,
-    "schedule/get-group-names",
+    "v2/schedule/group-names",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {

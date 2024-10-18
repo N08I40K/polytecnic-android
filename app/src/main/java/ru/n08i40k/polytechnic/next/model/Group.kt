@@ -10,7 +10,7 @@ import java.util.Calendar
 @Serializable
 data class Group(
     val name: String,
-    val days: ArrayList<Day?>
+    val days: List<Day>
 ) : Parcelable {
     val currentIdx: Int?
         get() {
@@ -27,7 +27,7 @@ data class Group(
             return days.getOrNull(currentIdx ?: return null)
         }
 
-    val currentKV: Pair<Int, Day?>?
+    val currentKV: Pair<Int, Day>?
         get() {
             val idx = currentIdx ?: return null
             return Pair(idx, days[idx])

@@ -15,7 +15,7 @@ class AuthChangePassword(
 ) : AuthorizedRequest(
     context,
     Method.POST,
-    "auth/change-password",
+    "v1/auth/change-password",
     { listener.onResponse(null) },
     errorListener,
     canBeUnauthorized = true

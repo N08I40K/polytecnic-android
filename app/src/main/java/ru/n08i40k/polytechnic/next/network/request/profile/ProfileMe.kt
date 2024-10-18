@@ -13,7 +13,7 @@ class ProfileMe(
 ) : AuthorizedRequest(
     context,
     Method.GET,
-    "users/me",
+    "v2/users/me",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 )

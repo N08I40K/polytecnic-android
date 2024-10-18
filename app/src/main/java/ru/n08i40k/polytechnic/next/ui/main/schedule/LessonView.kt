@@ -1,12 +1,13 @@
 package ru.n08i40k.polytechnic.next.ui.main.schedule
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -26,11 +27,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import kotlinx.datetime.LocalDateTime
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.schedule.impl.FakeScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonTime
+import ru.n08i40k.polytechnic.next.model.LessonType
+import ru.n08i40k.polytechnic.next.model.SubGroup
+import ru.n08i40k.polytechnic.next.utils.dayMinutes
 import ru.n08i40k.polytechnic.next.utils.fmtAsClock
 
 private enum class LessonTimeFormat {
@@ -58,28 +63,36 @@ private fun fmtTime(start: Int, end: Int, format: LessonTimeFormat): ArrayList<S
 @Preview(showBackground = true)
 @Composable
 fun LessonExtraInfo(
-    lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0]!!.lessons[0]!!,
+    lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[0],
     mutableExpanded: MutableState<Boolean> = mutableStateOf(true)
 ) {
     Dialog(onDismissRequest = { mutableExpanded.value = false }) {
+        if (lesson.type === LessonType.BREAK) {
+            mutableExpanded.value = false
+            return@Dialog
+        }
+
         Card {
             Column(Modifier.padding(10.dp)) {
-                Text(lesson.name)
+                Text(lesson.name!!)
 
-                if (lesson.teacherNames.isNotEmpty()) {
-                    val teachers = buildString {
-                        append(stringResource(if (lesson.teacherNames.count() > 1) R.string.lesson_teachers else R.string.lesson_teacher))
+                for (subGroup in lesson.subGroups) {
+                    val subGroups = buildString {
+                        append("[")
+                        append(subGroup.number)
+                        append("] ")
+                        append(subGroup.teacher)
                         append(" - ")
-                        append(lesson.teacherNames.joinToString(", "))
+                        append(subGroup.cabinet)
                     }
-                    Text(teachers)
+                    Text(subGroups)
                 }
 
                 val duration = buildString {
                     append(stringResource(R.string.lesson_duration))
                     append(" - ")
                     val duration =
-                        lesson.time.end - lesson.time.start
+                        lesson.time.end.dayMinutes - lesson.time.start.dayMinutes
 
                     append(duration / 60)
                     append(stringResource(R.string.hours))
@@ -88,15 +101,6 @@ fun LessonExtraInfo(
                     append(stringResource(R.string.minutes))
                 }
                 Text(duration)
-
-                if (lesson.cabinets.isNotEmpty()) {
-                    val cabinets = buildString {
-                        append(stringResource(R.string.cabinets))
-                        append(" - ")
-                        append(lesson.cabinets.joinToString(", "))
-                    }
-                    Text(cabinets)
-                }
             }
         }
     }
@@ -105,47 +109,74 @@ fun LessonExtraInfo(
 @Preview(showBackground = true)
 @Composable
 private fun LessonViewRow(
-    idx: Int = 1,
-    time: LessonTime? = LessonTime(0, 60),
+    range: List<Int>? = listOf(1, 3),
+    time: LessonTime = LessonTime.fromLocalDateTime(
+        LocalDateTime(2024, 1, 1, 0, 0),
+        LocalDateTime(2024, 1, 1, 1, 0),
+    ),
     timeFormat: LessonTimeFormat = LessonTimeFormat.FROM_TO,
     name: String = "Test",
-    teacherNames: ArrayList<String> = arrayListOf(
-        "Хомченко Н.Е. (1 подggggggggggggggggggggggggggggggggggggggгруппа)",
-        "Хомченко Н.Е. (2 подгруппа)"
-    ),
-    cabinets: ArrayList<String> = arrayListOf("14", "31"),
+    subGroups: List<SubGroup> = listOf(),
     cardColors: CardColors = CardDefaults.cardColors(),
-    verticalPadding: Dp = 10.dp
+    verticalPadding: Dp = 10.dp,
+    now: Boolean = true,
 ) {
     val contentColor =
-        if (timeFormat == LessonTimeFormat.FROM_TO) cardColors.contentColor else cardColors.disabledContentColor
+        if (timeFormat == LessonTimeFormat.FROM_TO) cardColors.contentColor
+        else cardColors.disabledContentColor
 
-    val teacherNamesRepl = teacherNames.map { it.replace("подгруппа", "подгр.") }
+    val rangeSize = if (range == null) 1 else (range[1] - range[0] + 1) * 2
 
-    Row(
-        modifier = Modifier.padding(10.dp, verticalPadding),
-        verticalAlignment = Alignment.CenterVertically,
+    Box(
+        if (now) Modifier.border(
+            BorderStroke(
+                3.5.dp,
+                Color(
+                    cardColors.containerColor.red * 0.5F,
+                    cardColors.containerColor.green * 0.5F,
+                    cardColors.containerColor.blue * 0.5F,
+                    1F
+                )
+            )
+        ) else Modifier
     ) {
-        Text(
-            text = if (idx == -1) "1" else idx.toString(),
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold,
-            color = if (idx == -1) Color(0) else contentColor
-        )
+        Row(
+            modifier = Modifier.padding(10.dp, verticalPadding * rangeSize),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val rangeString = run {
+                if (range == null)
+                    "   "
+                else
+                    buildString {
+                        val same = range[0] == range[1]
 
-        Spacer(Modifier.width(7.5.dp))
-
-        if (time != null) {
-            val formattedTime: ArrayList<String> = fmtTime(time.start, time.end, timeFormat)
+                        append(if (same) " " else range[0])
+                        append(if (same) range[0] else "-")
+                        append(if (same) " " else range[1])
+                    }
+            }
+            Text(
+                text = rangeString,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                color = contentColor
+            )
 
             Column(
-                modifier = Modifier.fillMaxWidth(0.25f),
+                modifier = Modifier.fillMaxWidth(0.20f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                val formattedTime: ArrayList<String> =
+                    fmtTime(time.start.dayMinutes, time.end.dayMinutes, timeFormat)
+
                 Text(
-                    text = formattedTime[0], fontFamily = FontFamily.Monospace, color = contentColor
+                    text = formattedTime[0],
+                    fontFamily = FontFamily.Monospace,
+                    color = contentColor
                 )
+
                 if (formattedTime.count() > 1) {
                     Text(
                         text = formattedTime[1],
@@ -154,54 +185,47 @@ private fun LessonViewRow(
                     )
                 }
             }
-        }
 
-        Spacer(Modifier.width(7.5.dp))
-
-        Column(
-            verticalArrangement = Arrangement.Center
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = name,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = contentColor
-                    )
-
-                    for (teacherName in teacherNamesRepl) {
+            Column(verticalArrangement = Arrangement.Center) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = teacherName,
+                            text = name,
+                            fontWeight = FontWeight.Medium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = contentColor
                         )
+
+                        for (subGroup in subGroups) {
+                            Text(
+                                text = subGroup.teacher,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = contentColor
+                            )
+                        }
+                    }
+
+                    Column(modifier = Modifier.wrapContentWidth()) {
+                        if (subGroups.size != 1)
+                            Text(text = "")
+                        for (subGroup in subGroups) {
+                            Text(
+                                text = subGroup.cabinet,
+                                maxLines = 1,
+                                fontFamily = FontFamily.Monospace,
+                                color = contentColor
+                            )
+                        }
                     }
                 }
 
-                Column(modifier = Modifier.wrapContentWidth()) {
-                    if (cabinets.size <= teacherNamesRepl.size) {
-                        Text(
-                            text = "",
-                            maxLines = 1
-                        )
-                    }
-                    for (listIdx: Int in 0..<cabinets.size) {
-                        Text(
-                            text = cabinets[listIdx],
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = contentColor
-                        )
-                    }
-                }
             }
-
         }
     }
 }
@@ -209,37 +233,39 @@ private fun LessonViewRow(
 @Preview(showBackground = true)
 @Composable
 fun FreeLessonRow(
-    lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0]!!.lessons[0]!!,
-    nextLesson: Lesson = FakeScheduleRepository.exampleGroup.days[0]!!.lessons[1]!!,
-    cardColors: CardColors = CardDefaults.cardColors()
+    lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[0],
+    nextLesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[1],
+    cardColors: CardColors = CardDefaults.cardColors(),
+    now: Boolean = true
 ) {
     LessonViewRow(
-        -1,
-        LessonTime(lesson.time.end, nextLesson.time.start),
+        lesson.defaultRange,
+        LessonTime(lesson.time.start, nextLesson.time.end),
         LessonTimeFormat.ONLY_MINUTES_DURATION,
         stringResource(R.string.lesson_break),
-        arrayListOf(),
-        arrayListOf(),
+        lesson.subGroups,
         cardColors,
-        2.5.dp
+        2.5.dp,
+        now
     )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun LessonRow(
-    day: Day = FakeScheduleRepository.exampleGroup.days[0]!!,
-    lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0]!!.lessons[0]!!,
-    cardColors: CardColors = CardDefaults.cardColors()
+    day: Day = FakeScheduleRepository.exampleGroup.days[0],
+    lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[0],
+    cardColors: CardColors = CardDefaults.cardColors(),
+    now: Boolean = true,
 ) {
     LessonViewRow(
-        lesson.defaultIndex,
+        lesson.defaultRange,
         lesson.time,
         LessonTimeFormat.FROM_TO,
-        lesson.name,
-        lesson.teacherNames,
-        lesson.cabinets,
+        lesson.name!!,
+        lesson.subGroups,
         cardColors,
-        5.dp
+        5.dp,
+        now
     )
 }

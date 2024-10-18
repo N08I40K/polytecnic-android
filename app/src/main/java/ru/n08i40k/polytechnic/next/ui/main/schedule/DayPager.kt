@@ -27,10 +27,10 @@ import java.util.logging.Level
 import kotlin.math.absoluteValue
 
 private fun isCurrentWeek(group: Group): Boolean {
-    if (group.days.size == 0 || group.days[0] == null)
+    if (group.days.isEmpty())
         return true
 
-    val dateString = group.days[0]!!.name
+    val dateString = group.days[0].name
 
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale("ru"))
     val datePart = dateString.split(" ").getOrNull(1) ?: return true
@@ -49,10 +49,12 @@ private fun isCurrentWeek(group: Group): Boolean {
 @Composable
 fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
     val currentDay = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2)
-    val calendarDay = currentDay
-        .coerceAtLeast(0)
-        .coerceAtMost(group.days.size - 1)
-    val pagerState = rememberPagerState(initialPage = calendarDay, pageCount = { group.days.size })
+    val calendarDay = if (currentDay == -1) 6 else currentDay
+
+    val pagerState = rememberPagerState(
+        initialPage = calendarDay
+            .coerceAtMost(group.days.size - 1),
+        pageCount = { group.days.size })
 
     Column {
         if (!isCurrentWeek(group)) {
@@ -65,7 +67,9 @@ fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
             state = pagerState,
             contentPadding = PaddingValues(horizontal = 20.dp),
             verticalAlignment = Alignment.Top,
-            modifier = Modifier.height(600.dp).padding(top = 5.dp)
+            modifier = Modifier
+                .height(600.dp)
+                .padding(top = 5.dp)
         ) { page ->
             DayCard(
                 modifier = Modifier.graphicsLayer {
@@ -82,7 +86,7 @@ fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
                     )
                 },
                 day = group.days[page],
-                current = currentDay == page
+                distance = page - currentDay
             )
         }
     }

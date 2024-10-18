@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.startForegroundService
+import kotlinx.datetime.LocalDateTime
 import ru.n08i40k.polytechnic.next.NotificationChannels
 import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
@@ -17,6 +18,7 @@ import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Group
 import ru.n08i40k.polytechnic.next.model.Lesson
+import ru.n08i40k.polytechnic.next.utils.dayMinutes
 import ru.n08i40k.polytechnic.next.utils.fmtAsClock
 import ru.n08i40k.polytechnic.next.utils.getDayMinutes
 import java.util.Calendar
@@ -64,7 +66,7 @@ class CurrentLessonViewService : Service() {
         override fun run() {
             val logger = Logger.getLogger("CLV.updateRunnable")
 
-            if (day == null || day!!.nonNullIndices.isEmpty()) {
+            if (day == null || day!!.lessons.isEmpty()) {
                 logger.warning("Stopping, because day is null or empty!")
                 stopSelf()
                 return
@@ -99,15 +101,16 @@ class CurrentLessonViewService : Service() {
                 return
             }
 
-            val firstLessonIdx = day!!.distanceToNextByMinutes(0)?.first
-                ?: throw NullPointerException("Is this even real?")
-            val distanceToFirst = day!!.lessons[firstLessonIdx]!!.time!!.start - currentMinutes
+            val firstLessonIdx =
+                day!!.distanceToNextByLocalDateTime(LocalDateTime(0, 0, 0, 0, 0))?.first
+                    ?: throw NullPointerException("Is this even real?")
+            val distanceToFirst = day!!.lessons[firstLessonIdx]!!.time!!.start.dayMinutes - currentMinutes
 
             val currentLessonDelay =
                 if (currentLesson == null) // Если эта пара - перемена, то конец перемены через (результат getDistanceToNext)
                     nextLessonEntry!!.second
                 else // Если эта пара - обычная пара, то конец пары через (конец этой пары - текущее кол-во минут)
-                    currentLesson.time!!.end - currentMinutes
+                    currentLesson.time!!.end.dayMinutes - currentMinutes
 
             val currentLessonName =
                 currentLesson?.getNameAndCabinetsShort(this@CurrentLessonViewService)
@@ -144,7 +147,7 @@ class CurrentLessonViewService : Service() {
                 getString(
                     R.string.lesson_going_notification_description,
                     currentLessonName,
-                    nextLessonTotal.fmtAsClock(),
+                    nextLessonTotal.dayMinutes.fmtAsClock(),
                     nextLessonName,
                 )
             )
@@ -183,7 +186,7 @@ class CurrentLessonViewService : Service() {
         }
 
         val currentDay = group.current
-        if (currentDay == null || currentDay.nonNullIndices.isEmpty()) {
+        if (currentDay == null || currentDay.lessons.isEmpty()) {
             logger.warning("Stopping, because current day is null or empty")
             stopSelf()
             return
@@ -191,7 +194,7 @@ class CurrentLessonViewService : Service() {
 
         val nowMinutes = Calendar.getInstance().getDayMinutes()
         if (nowMinutes < ((5 * 60) + 30)
-            || currentDay.last!!.time.end < nowMinutes
+            || currentDay.last!!.time.end.dayMinutes < nowMinutes
         ) {
             logger.warning("Stopping, because service started outside of acceptable time range!")
             stopSelf()

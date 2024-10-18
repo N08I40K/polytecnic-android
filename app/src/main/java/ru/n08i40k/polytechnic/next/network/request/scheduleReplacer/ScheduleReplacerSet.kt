@@ -14,7 +14,7 @@ class ScheduleReplacerSet(
 ) : AuthorizedMultipartRequest(
     context,
     Method.POST,
-    "schedule-replacer/set",
+    "v1/schedule-replacer/set",
     { listener.onResponse(null) },
     errorListener
 ) {

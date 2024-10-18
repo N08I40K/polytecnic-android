@@ -5,26 +5,30 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import ru.n08i40k.polytechnic.next.R
+import ru.n08i40k.polytechnic.next.utils.dayMinutes
 import ru.n08i40k.polytechnic.next.utils.limit
 
 @Parcelize
 @Serializable
 data class Lesson(
     val type: LessonType,
-    val defaultIndex: Int,
-    val name: String,
+    val defaultRange: List<Int>?,
+    val name: String?,
     val time: LessonTime,
-    val cabinets: ArrayList<String>,
-    val teacherNames: ArrayList<String>
+    val subGroups: List<SubGroup>
 ) : Parcelable {
     val duration: Int
         get() {
-            return time.end - time.start
+            val startMinutes = time.start.dayMinutes
+            val endMinutes = time.end.dayMinutes
+
+            return endMinutes - startMinutes
         }
 
     fun getNameAndCabinetsShort(context: Context): String {
-        val limitedName = name limit 15
+        val limitedName = name!! limit 15
 
+        val cabinets = subGroups.map { it.cabinet }
 
         if (cabinets.isEmpty())
             return limitedName

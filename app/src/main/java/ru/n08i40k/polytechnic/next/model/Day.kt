@@ -1,30 +1,33 @@
 package ru.n08i40k.polytechnic.next.model
 
 import android.os.Parcelable
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 import kotlinx.serialization.Serializable
-import ru.n08i40k.polytechnic.next.utils.getDayMinutes
-import java.util.Calendar
+import ru.n08i40k.polytechnic.next.utils.dateTime
+import ru.n08i40k.polytechnic.next.utils.dayMinutes
+import ru.n08i40k.polytechnic.next.utils.now
+
 
 @Parcelize
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 @Serializable
 class Day(
     val name: String,
-    val nonNullIndices: ArrayList<Int>,
-    val defaultIndices: ArrayList<Int>,
-    val customIndices: ArrayList<Int>,
-    val lessons: ArrayList<Lesson?>
+    val date: @RawValue Instant,
+    val lessons: List<Lesson>
 ) : Parcelable {
-    fun distanceToNextByMinutes(from: Int): Pair<Int, Int>? {
+    fun distanceToNextByLocalDateTime(from: LocalDateTime): Pair<Int, Int>? {
         val toIdx = lessons
-            .map { if (it?.time == null) null else it.time.start }
-            .indexOfFirst { if (it == null) false else it > from }
+            .map { it.time.start }
+            .indexOfFirst { it.dateTime > from }
 
         if (toIdx == -1)
             return null
 
-        return Pair(toIdx, lessons[toIdx]!!.time.start - from)
+        return Pair(toIdx, lessons[toIdx].time.start.dayMinutes - from.dayMinutes)
     }
 
     fun distanceToNextByIdx(from: Int? = null): Pair<Int, Int>? {
@@ -35,24 +38,22 @@ class Day(
 
         val fromTime =
             if (from != null)
-                fromLesson!!.time.end
+                fromLesson!!.time.end.dateTime
             else
-                Calendar.getInstance()
-                    .get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance()
-                    .get(Calendar.MINUTE)
+                LocalDateTime.now()
 
-        return distanceToNextByMinutes(fromTime)
+        return distanceToNextByLocalDateTime(fromTime)
     }
 
     // current
     val currentIdx: Int?
         get() {
-            val minutes = Calendar.getInstance().getDayMinutes()
+            val now = LocalDateTime.now()
 
-            for (lessonIdx in nonNullIndices) {
-                val lesson = lessons[lessonIdx]!!
+            for (lessonIdx in lessons.indices) {
+                val lesson = lessons[lessonIdx]
 
-                if (lesson.time.start <= minutes && minutes < lesson.time.end)
+                if (lesson.time.start.dateTime <= now && now < lesson.time.end.dateTime)
                     return lessonIdx
             }
 
@@ -67,36 +68,36 @@ class Day(
     val currentKV: Pair<Int, Lesson>?
         get() {
             val idx = currentIdx ?: return null
-            return Pair(idx, lessons[idx]!!)
+            return Pair(idx, lessons[idx])
         }
 
     // first
     val firstIdx: Int?
-        get() = nonNullIndices.getOrNull(0)
+        get() = if (lessons.isEmpty()) null else 0
 
     val first: Lesson?
         get() {
-            return lessons[firstIdx ?: return null]!!
+            return lessons[firstIdx ?: return null]
         }
 
     val firstKV: Pair<Int, Lesson>?
         get() {
             val idx = firstIdx ?: return null
-            return Pair(idx, lessons[idx]!!)
+            return Pair(idx, lessons[idx])
         }
 
     // last
     val lastIdx: Int?
-        get() = nonNullIndices.getOrNull(nonNullIndices.size - 1)
+        get() = if (lessons.isEmpty()) null else lessons.size - 1
 
     val last: Lesson?
         get() {
-            return lessons[lastIdx ?: return null]!!
+            return lessons[lastIdx ?: return null]
         }
 
     val lastKV: Pair<Int, Lesson>?
         get() {
             val idx = lastIdx ?: return null
-            return Pair(idx, lessons[idx]!!)
+            return Pair(idx, lessons[idx])
         }
 }

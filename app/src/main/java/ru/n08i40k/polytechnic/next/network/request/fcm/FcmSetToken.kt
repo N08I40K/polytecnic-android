@@ -11,7 +11,7 @@ class FcmSetToken(
     errorListener: Response.ErrorListener?,
 ) : AuthorizedRequest(
     context, Method.POST,
-    "fcm/set-token/$token",
+    "v1/fcm/set-token/$token",
     { listener.onResponse(Unit) },
     errorListener,
     true
