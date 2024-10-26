@@ -157,7 +157,10 @@ private fun LinkButton(
             verticalAlignment = Alignment.CenterVertically
         ) {
             BadgedBox(badge = { if (badged) Badge() }) {
-                Icon(imageVector = icon, contentDescription = text)
+                Icon(
+                    imageVector = icon,
+                    contentDescription = text
+                )
             }
             Spacer(Modifier.width(5.dp))
             Text(text)
@@ -189,7 +192,10 @@ private fun TopNavBar(
         actions = {
             IconButton(onClick = { dropdownExpanded = true }) {
                 BadgedBox(badge = { if (updateAvailable) Badge() }) {
-                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "TopAppBar Menu")
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "top app bar menu"
+                    )
                 }
             }
             DropdownMenu(

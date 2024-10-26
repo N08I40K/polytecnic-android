@@ -4,8 +4,9 @@ import android.os.Parcelable
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.RawValue
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.n08i40k.polytechnic.next.utils.InstantAsLongSerializer
 import ru.n08i40k.polytechnic.next.utils.dateTime
 import ru.n08i40k.polytechnic.next.utils.dayMinutes
 import ru.n08i40k.polytechnic.next.utils.now
@@ -16,9 +17,18 @@ import ru.n08i40k.polytechnic.next.utils.now
 @Serializable
 class Day(
     val name: String,
-    val date: @RawValue Instant,
+    @Serializable(with = InstantAsLongSerializer::class)
+    @SerialName("date")
+    private val dateMillis: Long,
     val lessons: List<Lesson>
 ) : Parcelable {
+    constructor(name: String, date: Instant, lessons: List<Lesson>) : this(
+        name, date.toEpochMilliseconds(), lessons
+    )
+
+    val date: Instant
+        get() = Instant.fromEpochMilliseconds(dateMillis)
+
     fun distanceToNextByLocalDateTime(from: LocalDateTime): Pair<Int, Int>? {
         val toIdx = lessons
             .map { it.time.start }

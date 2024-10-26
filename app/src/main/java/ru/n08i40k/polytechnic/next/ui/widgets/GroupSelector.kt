@@ -76,7 +76,7 @@ fun GroupSelector(
                 value = value ?: groups.getOrElse(1) { "TODO" }!!,
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Filled.Email,
+                        Icons.Filled.Email,
                         contentDescription = "group"
                     )
                 },

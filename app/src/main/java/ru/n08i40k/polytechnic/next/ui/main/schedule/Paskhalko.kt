@@ -11,6 +11,9 @@ import ru.n08i40k.polytechnic.next.R
 @Composable
 internal fun PaskhalkoDialog() {
     Dialog(onDismissRequest = {}) {
-        Image(painterResource(R.drawable.paskhalko), contentDescription = "Paskhalko")
+        Image(
+            painter = painterResource(R.drawable.paskhalko),
+            contentDescription = "paskhalko"
+        )
     }
 }

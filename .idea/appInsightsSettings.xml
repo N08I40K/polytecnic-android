@@ -17,6 +17,20 @@
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
+              <option name="versions">
+                <list>
+                  <VersionSetting>
+                    <option name="buildVersion" value="17" />
+                    <option name="displayName" value="2.0.1 (17)" />
+                    <option name="displayVersion" value="2.0.1" />
+                  </VersionSetting>
+                  <VersionSetting>
+                    <option name="buildVersion" value="16" />
+                    <option name="displayName" value="2.0.0prod (16)" />
+                    <option name="displayVersion" value="2.0.0prod" />
+                  </VersionSetting>
+                </list>
+              </option>
               <option name="visibilityType" value="ALL" />
             </InsightsFilterSettings>
           </value>

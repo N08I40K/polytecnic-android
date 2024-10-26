@@ -147,7 +147,7 @@ private fun ExpandableCardArrow(
     Icon(
         modifier = Modifier.rotate(rotationDegree),
         imageVector = Icons.Filled.ArrowDropDown,
-        contentDescription = "Expandable Arrow"
+        contentDescription = "expandable arrow"
     )
 }
 

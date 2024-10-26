@@ -17,7 +17,8 @@ fun PolytechnicApp() {
         val navController = rememberNavController()
 
         NavHost(
-            navController = navController, startDestination = "auth"
+            navController = navController,
+            startDestination = "auth"
         ) {
             composable(route = "auth") {
                 AuthScreen(navController)

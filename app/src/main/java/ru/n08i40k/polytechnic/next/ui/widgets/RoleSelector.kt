@@ -62,7 +62,12 @@ fun RoleSelector(
                 onDismissRequest = { expanded = false }) {
                 AcceptableUserRoles.forEach {
                     DropdownMenuItem(
-                        leadingIcon = { Icon(it.icon, contentDescription = "Role icon") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = it.icon,
+                                contentDescription = "role icon"
+                            )
+                        },
                         text = { Text(stringResource(it.stringId)) },
                         onClick = {
                             expanded = false

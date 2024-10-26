@@ -51,8 +51,14 @@ fun NotificationCard(
                     else -> AppIcons.Filled.Info
                 }
 
-                Icon(imageVector = icon, contentDescription = "Level")
-                Icon(imageVector = icon, contentDescription = "Level")
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "level"
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "level"
+                )
             }
             Text(
                 text = title,
