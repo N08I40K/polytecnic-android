@@ -102,7 +102,7 @@ class CurrentLessonViewService : Service() {
             }
 
             val firstLessonIdx =
-                day!!.distanceToNextByLocalDateTime(LocalDateTime(0, 0, 0, 0, 0))?.first
+                day!!.distanceToNextByLocalDateTime(LocalDateTime(1, 1, 1, 0, 0))?.first
                     ?: throw NullPointerException("Is this even real?")
             val distanceToFirst = day!!.lessons[firstLessonIdx]!!.time!!.start.dayMinutes - currentMinutes
 

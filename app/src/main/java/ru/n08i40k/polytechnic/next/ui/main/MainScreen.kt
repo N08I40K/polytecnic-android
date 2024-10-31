@@ -47,7 +47,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -134,7 +133,7 @@ private fun NavHostContainer(
 }
 
 private fun openLink(context: Context, link: String) {
-    startActivity(context, Intent(Intent.ACTION_VIEW, Uri.parse(link)), null)
+    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)), null)
 }
 
 @Composable
