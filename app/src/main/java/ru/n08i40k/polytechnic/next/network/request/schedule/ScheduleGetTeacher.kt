@@ -7,21 +7,22 @@ import kotlinx.serialization.json.Json
 import ru.n08i40k.polytechnic.next.model.GroupOrTeacher
 import ru.n08i40k.polytechnic.next.network.request.CachedRequest
 
-class ScheduleGet(
+class ScheduleGetTeacher(
     context: Context,
+    teacher: String,
     listener: Response.Listener<ResponseDto>,
     errorListener: Response.ErrorListener? = null
 ) : CachedRequest(
     context,
     Method.GET,
-    "v2/schedule/group",
+    "v2/schedule/teacher/$teacher",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {
     @Serializable
     data class ResponseDto(
         val updatedAt: String,
-        val group: GroupOrTeacher,
+        val teacher: GroupOrTeacher,
         val updated: ArrayList<Int>,
     )
 }

@@ -75,5 +75,9 @@
     <string name="no_connection">Нет подключения к интернету!</string>
     <string name="today">Сегодня</string>
     <string name="yesterday">Вчера</string>
-    <string name="tommorow">Завтра</string>
+    <string name="tomorrow">Завтра</string>
+    <string name="teachers">Преподаватели</string>
+    <string name="teacher_name">ФИО преподавателя</string>
+    <string name="teacher_not_selected">Преподаватель не выбран или вы допустили ошибку в его ФИО.</string>
+    <string name="failed_to_fetch_teacher_names">Не удалось получить список ФИО преподавателей!</string>
 </resources>

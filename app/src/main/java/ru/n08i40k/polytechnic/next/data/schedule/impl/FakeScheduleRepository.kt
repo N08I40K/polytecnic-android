@@ -11,7 +11,7 @@ import kotlinx.datetime.toInstant
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.data.schedule.ScheduleRepository
 import ru.n08i40k.polytechnic.next.model.Day
-import ru.n08i40k.polytechnic.next.model.Group
+import ru.n08i40k.polytechnic.next.model.GroupOrTeacher
 import ru.n08i40k.polytechnic.next.model.Lesson
 import ru.n08i40k.polytechnic.next.model.LessonTime
 import ru.n08i40k.polytechnic.next.model.LessonType
@@ -31,14 +31,15 @@ private fun genBreak(start: Instant, end: Instant): Lesson {
             start,
             end
         ),
-        subGroups = listOf()
+        subGroups = listOf(),
+        group = null
     )
 }
 
 class FakeScheduleRepository : ScheduleRepository {
     @Suppress("SpellCheckingInspection")
     companion object {
-        val exampleGroup = Group(
+        val exampleGroup = GroupOrTeacher(
             name = "ИС-214/23", days = arrayListOf(
                 Day(
                     name = "Понедельник",
@@ -52,7 +53,8 @@ class FakeScheduleRepository : ScheduleRepository {
                                 genLocalDateTime(8, 30),
                                 genLocalDateTime(8, 40),
                             ),
-                            subGroups = listOf()
+                            subGroups = listOf(),
+                            group = null
                         ),
                         genBreak(
                             genLocalDateTime(8, 40),
@@ -66,7 +68,8 @@ class FakeScheduleRepository : ScheduleRepository {
                                 genLocalDateTime(8, 45),
                                 genLocalDateTime(9, 15),
                             ),
-                            subGroups = listOf()
+                            subGroups = listOf(),
+                            group = null
                         ),
                         genBreak(
                             genLocalDateTime(9, 15),
@@ -86,7 +89,8 @@ class FakeScheduleRepository : ScheduleRepository {
                                     number = 1,
                                     cabinet = "43"
                                 )
-                            )
+                            ),
+                            group = null
                         ),
                         genBreak(
                             genLocalDateTime(10, 45),
@@ -111,7 +115,8 @@ class FakeScheduleRepository : ScheduleRepository {
                                     number = 2,
                                     cabinet = "44"
                                 ),
-                            )
+                            ),
+                            group = null
                         ),
                         genBreak(
                             genLocalDateTime(12, 15),
@@ -136,7 +141,118 @@ class FakeScheduleRepository : ScheduleRepository {
                                     number = 2,
                                     cabinet = "41"
                                 ),
-                            )
+                            ),
+                            group = null
+                        ),
+                    )
+                )
+            )
+        )
+
+        val exampleTeacher = GroupOrTeacher(
+            name = "Хомченко Н.Е.", days = arrayListOf(
+                Day(
+                    name = "Понедельник",
+                    date = LocalDateTime.now().toInstant(TimeZone.currentSystemDefault()),
+                    lessons = listOf(
+                        Lesson(
+                            type = LessonType.ADDITIONAL,
+                            defaultRange = null,
+                            name = "Линейка",
+                            time = LessonTime(
+                                genLocalDateTime(8, 30),
+                                genLocalDateTime(8, 40),
+                            ),
+                            subGroups = listOf(),
+                            group = "ИС-214/23"
+                        ),
+                        genBreak(
+                            genLocalDateTime(8, 40),
+                            genLocalDateTime(8, 45),
+                        ),
+                        Lesson(
+                            type = LessonType.ADDITIONAL,
+                            defaultRange = null,
+                            name = "Разговор о важном",
+                            time = LessonTime(
+                                genLocalDateTime(8, 45),
+                                genLocalDateTime(9, 15),
+                            ),
+                            subGroups = listOf(),
+                            group = "ИС-214/23"
+                        ),
+                        genBreak(
+                            genLocalDateTime(9, 15),
+                            genLocalDateTime(9, 25),
+                        ),
+                        Lesson(
+                            type = LessonType.DEFAULT,
+                            defaultRange = listOf(1, 1),
+                            name = "МДК.05.01 Проектирование и дизайн информационных систем",
+                            time = LessonTime(
+                                genLocalDateTime(9, 25),
+                                genLocalDateTime(10, 45),
+                            ),
+                            subGroups = listOf(
+                                SubGroup(
+                                    teacher = "Ивашова А.Н.",
+                                    number = 1,
+                                    cabinet = "43"
+                                )
+                            ),
+                            group = "ИС-214/23"
+                        ),
+                        genBreak(
+                            genLocalDateTime(10, 45),
+                            genLocalDateTime(10, 55),
+                        ),
+                        Lesson(
+                            type = LessonType.DEFAULT,
+                            defaultRange = listOf(2, 2),
+                            name = "Основы проектирования баз данных",
+                            time = LessonTime(
+                                genLocalDateTime(10, 55),
+                                genLocalDateTime(12, 15),
+                            ),
+                            subGroups = listOf(
+                                SubGroup(
+                                    teacher = "Чинарева Е.А.",
+                                    number = 1,
+                                    cabinet = "21"
+                                ),
+                                SubGroup(
+                                    teacher = "Ивашова А.Н.",
+                                    number = 2,
+                                    cabinet = "44"
+                                ),
+                            ),
+                            group = "ИС-214/23"
+                        ),
+                        genBreak(
+                            genLocalDateTime(12, 15),
+                            genLocalDateTime(12, 35),
+                        ),
+                        Lesson(
+                            type = LessonType.DEFAULT,
+                            defaultRange = listOf(3, 3),
+                            name = "Операционные системы и среды",
+                            time = LessonTime(
+                                genLocalDateTime(12, 35),
+                                genLocalDateTime(13, 55),
+                            ),
+                            subGroups = listOf(
+                                SubGroup(
+                                    teacher = "Сергачева А.О.",
+                                    number = 1,
+                                    cabinet = "42"
+                                ),
+                                SubGroup(
+                                    teacher = "Воронцева Н.В.",
+                                    number = 2,
+                                    cabinet = "41"
+                                ),
+                            ),
+                            group = "ИС-214/23"
                         ),
                     )
                 )
@@ -144,17 +260,28 @@ class FakeScheduleRepository : ScheduleRepository {
         )
     }
 
-    private val group = MutableStateFlow<Group?>(exampleGroup)
+    private val group = MutableStateFlow<GroupOrTeacher?>(exampleGroup)
+    private val teacher = MutableStateFlow<GroupOrTeacher?>(exampleTeacher)
 
     private var updateCounter: Int = 0
 
-    override suspend fun getGroup(): MyResult<Group> {
+    override suspend fun getGroup(): MyResult<GroupOrTeacher> {
         return withContext(Dispatchers.IO) {
             delay(1500)
             if (updateCounter++ % 3 == 0) MyResult.Failure(
                 IllegalStateException()
             )
             else MyResult.Success(group.value!!)
+        }
+    }
+
+    override suspend fun getTeacher(name: String): MyResult<GroupOrTeacher> {
+        return withContext(Dispatchers.IO) {
+            delay(1500)
+            if (updateCounter++ % 3 == 0) MyResult.Failure(
+                IllegalStateException()
+            )
+            else MyResult.Success(teacher.value!!)
         }
     }
 }

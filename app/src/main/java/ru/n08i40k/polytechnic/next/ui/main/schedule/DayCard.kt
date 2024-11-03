@@ -102,7 +102,7 @@ fun DayCard(
                 text = stringResource(when (distance) {
                     -1 -> R.string.yesterday
                     0 -> R.string.today
-                    1 -> R.string.tommorow
+                    1 -> R.string.tomorrow
                     else -> throw RuntimeException()
                 }),
             )

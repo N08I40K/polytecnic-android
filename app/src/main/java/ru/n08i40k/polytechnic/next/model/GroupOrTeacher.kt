@@ -8,7 +8,7 @@ import java.util.Calendar
 @Suppress("MemberVisibilityCanBePrivate")
 @Parcelize
 @Serializable
-data class Group(
+data class GroupOrTeacher(
     val name: String,
     val days: List<Day>
 ) : Parcelable {

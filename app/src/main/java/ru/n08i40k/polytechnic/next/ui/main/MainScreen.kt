@@ -70,12 +70,14 @@ import ru.n08i40k.polytechnic.next.ui.icons.appicons.filled.Download
 import ru.n08i40k.polytechnic.next.ui.icons.appicons.filled.Telegram
 import ru.n08i40k.polytechnic.next.ui.main.profile.ProfileScreen
 import ru.n08i40k.polytechnic.next.ui.main.replacer.ReplacerScreen
-import ru.n08i40k.polytechnic.next.ui.main.schedule.ScheduleScreen
+import ru.n08i40k.polytechnic.next.ui.main.schedule.group.GroupScheduleScreen
+import ru.n08i40k.polytechnic.next.ui.main.schedule.teacher.TeacherScheduleScreen
+import ru.n08i40k.polytechnic.next.ui.model.GroupScheduleViewModel
 import ru.n08i40k.polytechnic.next.ui.model.ProfileUiState
 import ru.n08i40k.polytechnic.next.ui.model.ProfileViewModel
 import ru.n08i40k.polytechnic.next.ui.model.RemoteConfigViewModel
 import ru.n08i40k.polytechnic.next.ui.model.ScheduleReplacerViewModel
-import ru.n08i40k.polytechnic.next.ui.model.ScheduleViewModel
+import ru.n08i40k.polytechnic.next.ui.model.TeacherScheduleViewModel
 import ru.n08i40k.polytechnic.next.ui.model.profileViewModel
 
 
@@ -83,7 +85,8 @@ import ru.n08i40k.polytechnic.next.ui.model.profileViewModel
 private fun NavHostContainer(
     navController: NavHostController,
     padding: PaddingValues,
-    scheduleViewModel: ScheduleViewModel,
+    groupScheduleViewModel: GroupScheduleViewModel,
+    teacherScheduleViewModel: TeacherScheduleViewModel,
     scheduleReplacerViewModel: ScheduleReplacerViewModel?
 ) {
     val context = LocalContext.current
@@ -121,7 +124,15 @@ private fun NavHostContainer(
         }
 
         composable("schedule") {
-            ScheduleScreen(scheduleViewModel) { scheduleViewModel.refreshGroup() }
+            GroupScheduleScreen(groupScheduleViewModel) { groupScheduleViewModel.refresh() }
+        }
+
+        composable("teacher-schedule") {
+            TeacherScheduleScreen(teacherScheduleViewModel) {
+                if (it.isNotEmpty()) teacherScheduleViewModel.fetch(
+                    it
+                )
+            }
         }
 
         if (scheduleReplacerViewModel != null) {
@@ -283,8 +294,12 @@ fun MainScreen(
         )
 
     // schedule view model
-    val scheduleViewModel =
-        hiltViewModel<ScheduleViewModel>(LocalContext.current as ComponentActivity)
+    val groupScheduleViewModel =
+        hiltViewModel<GroupScheduleViewModel>(LocalContext.current as ComponentActivity)
+
+    // teacher view model
+    val teacherScheduleViewModel =
+        hiltViewModel<TeacherScheduleViewModel>(LocalContext.current as ComponentActivity)
 
     // schedule replacer view model
     val profileUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
@@ -312,7 +327,8 @@ fun MainScreen(
         NavHostContainer(
             navController,
             paddingValues,
-            scheduleViewModel,
+            groupScheduleViewModel,
+            teacherScheduleViewModel,
             scheduleReplacerViewModel
         )
     }

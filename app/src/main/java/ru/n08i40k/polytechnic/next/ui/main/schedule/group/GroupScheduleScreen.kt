@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.ui.main.schedule
+package ru.n08i40k.polytechnic.next.ui.main.schedule.group
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,9 +26,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.MockAppContainer
+import ru.n08i40k.polytechnic.next.ui.main.schedule.DayPager
+import ru.n08i40k.polytechnic.next.ui.model.GroupScheduleUiState
+import ru.n08i40k.polytechnic.next.ui.model.GroupScheduleViewModel
 import ru.n08i40k.polytechnic.next.ui.widgets.LoadingContent
-import ru.n08i40k.polytechnic.next.ui.model.ScheduleUiState
-import ru.n08i40k.polytechnic.next.ui.model.ScheduleViewModel
 
 @Composable
 private fun rememberUpdatedLifecycleOwner(): LifecycleOwner {
@@ -38,11 +39,11 @@ private fun rememberUpdatedLifecycleOwner(): LifecycleOwner {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun ScheduleScreen(
-    scheduleViewModel: ScheduleViewModel = ScheduleViewModel(MockAppContainer(LocalContext.current)),
+fun GroupScheduleScreen(
+    groupScheduleViewModel: GroupScheduleViewModel = GroupScheduleViewModel(MockAppContainer(LocalContext.current)),
     onRefresh: () -> Unit = {}
 ) {
-    val uiState by scheduleViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by groupScheduleViewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
         delay(120_000)
         onRefresh()
@@ -69,25 +70,25 @@ fun ScheduleScreen(
 
     LoadingContent(
         empty = when (uiState) {
-            is ScheduleUiState.NoSchedule -> uiState.isLoading
-            is ScheduleUiState.HasSchedule -> false
+            is GroupScheduleUiState.NoData -> uiState.isLoading
+            is GroupScheduleUiState.HasData -> false
         },
         loading = uiState.isLoading,
         onRefresh = onRefresh,
         verticalArrangement = Arrangement.Top
     ) {
         when (uiState) {
-            is ScheduleUiState.HasSchedule -> {
+            is GroupScheduleUiState.HasData -> {
                 Column {
-                    val hasSchedule = uiState as ScheduleUiState.HasSchedule
+                    val hasData = uiState as GroupScheduleUiState.HasData
 
-                    UpdateInfo(hasSchedule.lastUpdateAt, hasSchedule.updateDates)
+                    UpdateInfo(hasData.lastUpdateAt, hasData.updateDates)
                     Spacer(Modifier.height(10.dp))
-                    DayPager(hasSchedule.group)
+                    DayPager(hasData.group)
                 }
             }
 
-            is ScheduleUiState.NoSchedule -> {
+            is GroupScheduleUiState.NoData -> {
                 if (!uiState.isLoading) {
                     TextButton(onClick = onRefresh, modifier = Modifier.fillMaxSize()) {
                         Text(stringResource(R.string.reload), textAlign = TextAlign.Center)

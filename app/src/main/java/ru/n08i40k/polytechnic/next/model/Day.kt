@@ -15,11 +15,13 @@ import ru.n08i40k.polytechnic.next.utils.now
 @Parcelize
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 @Serializable
-class Day(
+data class Day(
     val name: String,
+
     @Serializable(with = InstantAsLongSerializer::class)
     @SerialName("date")
     private val dateMillis: Long,
+
     val lessons: List<Lesson>
 ) : Parcelable {
     constructor(name: String, date: Instant, lessons: List<Lesson>) : this(
@@ -29,30 +31,19 @@ class Day(
     val date: Instant
         get() = Instant.fromEpochMilliseconds(dateMillis)
 
-    fun distanceToNextByLocalDateTime(from: LocalDateTime): Pair<Int, Int>? {
-        val toIdx = lessons
-            .map { it.time.start }
-            .indexOfFirst { it.dateTime > from }
+    fun distanceToNext(from: LocalDateTime): Pair<Int, Int>? {
+        val nextIndex = lessons.map { it.time.start }.indexOfFirst { it.dateTime >= from }
 
-        if (toIdx == -1)
-            return null
+        if (nextIndex == -1) return null
 
-        return Pair(toIdx, lessons[toIdx].time.start.dayMinutes - from.dayMinutes)
+        return Pair(nextIndex, lessons[nextIndex].time.start.dayMinutes - from.dayMinutes)
     }
 
-    fun distanceToNextByIdx(from: Int? = null): Pair<Int, Int>? {
-        val fromLesson = if (from != null) lessons[from] else null
+    fun distanceToNext(fromIndex: Int? = null): Pair<Int, Int>? {
+        val fromLesson = fromIndex?.let { lessons[fromIndex] }
+        val fromTime = fromLesson?.time?.end?.dateTime ?: LocalDateTime.now()
 
-        if (from != null && fromLesson == null)
-            throw NullPointerException("Lesson (by given index) and it's time should be non-null!")
-
-        val fromTime =
-            if (from != null)
-                fromLesson!!.time.end.dateTime
-            else
-                LocalDateTime.now()
-
-        return distanceToNextByLocalDateTime(fromTime)
+        return distanceToNext(fromTime)
     }
 
     // current
@@ -63,8 +54,7 @@ class Day(
             for (lessonIdx in lessons.indices) {
                 val lesson = lessons[lessonIdx]
 
-                if (lesson.time.start.dateTime <= now && now < lesson.time.end.dateTime)
-                    return lessonIdx
+                if (lesson.time.start.dateTime <= now && now < lesson.time.end.dateTime) return lessonIdx
             }
 
             return null

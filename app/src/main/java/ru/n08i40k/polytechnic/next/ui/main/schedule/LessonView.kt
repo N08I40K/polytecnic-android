@@ -117,6 +117,7 @@ private fun LessonViewRow(
     timeFormat: LessonTimeFormat = LessonTimeFormat.FROM_TO,
     name: String = "Test",
     subGroups: List<SubGroup> = listOf(),
+    group: String? = "ИС-214/23",
     cardColors: CardColors = CardDefaults.cardColors(),
     verticalPadding: Dp = 10.dp,
     now: Boolean = true,
@@ -201,6 +202,16 @@ private fun LessonViewRow(
                             color = contentColor
                         )
 
+                        if (group != null) {
+                            Text(
+                                text = group,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = contentColor
+                            )
+                        }
+
                         for (subGroup in subGroups) {
                             Text(
                                 text = subGroup.teacher,
@@ -212,8 +223,10 @@ private fun LessonViewRow(
                     }
 
                     Column(modifier = Modifier.wrapContentWidth()) {
-                        if (subGroups.size != 1)
-                            Text(text = "")
+                        if (subGroups.size != 1) {
+                            for (i in 0..<(if (group != null) 2 else 1))
+                                Text(text = "")
+                        }
                         for (subGroup in subGroups) {
                             Text(
                                 text = subGroup.cabinet,
@@ -244,6 +257,7 @@ fun FreeLessonRow(
         LessonTimeFormat.ONLY_MINUTES_DURATION,
         stringResource(R.string.lesson_break),
         lesson.subGroups,
+        lesson.group,
         cardColors,
         2.5.dp,
         now
@@ -264,6 +278,7 @@ fun LessonRow(
         LessonTimeFormat.FROM_TO,
         lesson.name!!,
         lesson.subGroups,
+        lesson.group,
         cardColors,
         5.dp,
         now

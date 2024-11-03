@@ -37,6 +37,24 @@ fun LoadingContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoadingContent(
+    empty: Boolean,
+    emptyContent: @Composable () -> Unit = { FullScreenLoading() },
+    loading: Boolean,
+    content: @Composable () -> Unit
+) {
+    if (empty) {
+        emptyContent()
+        return
+    }
+
+    PullToRefreshBox(isRefreshing = loading, onRefresh = {}) {
+        content()
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun FullScreenLoading() {

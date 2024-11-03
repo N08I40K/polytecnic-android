@@ -75,5 +75,9 @@
     <string name="no_connection">No internet connection!</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
-    <string name="tommorow">Tommorow</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="teachers">Teachers</string>
+    <string name="teacher_name">Teacher name</string>
+    <string name="teacher_not_selected">Teacher not selected or you made mistake in his name.</string>
+    <string name="failed_to_fetch_teacher_names">Failed to fetch teacher names!</string>
 </resources>

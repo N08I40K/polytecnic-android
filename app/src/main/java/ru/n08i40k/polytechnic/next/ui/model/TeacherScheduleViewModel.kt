@@ -12,59 +12,69 @@ import kotlinx.coroutines.launch
 import ru.n08i40k.polytechnic.next.UpdateDates
 import ru.n08i40k.polytechnic.next.data.AppContainer
 import ru.n08i40k.polytechnic.next.data.MyResult
-import ru.n08i40k.polytechnic.next.model.Group
+import ru.n08i40k.polytechnic.next.model.GroupOrTeacher
 import java.util.Date
 import javax.inject.Inject
 
-sealed interface ScheduleUiState {
+sealed interface TeacherScheduleUiState {
     val isLoading: Boolean
 
-    data class NoSchedule(
+    data class NoData(
         override val isLoading: Boolean
-    ) : ScheduleUiState
+    ) : TeacherScheduleUiState
 
-    data class HasSchedule(
-        val group: Group,
+    data class HasData(
+        val teacher: GroupOrTeacher,
         val updateDates: UpdateDates,
         val lastUpdateAt: Long,
         override val isLoading: Boolean
-    ) : ScheduleUiState
+    ) : TeacherScheduleUiState
 }
 
-private data class ScheduleViewModelState(
-    val group: Group? = null,
+private data class TeacherScheduleViewModelState(
+    val teacher: GroupOrTeacher? = null,
     val updateDates: UpdateDates? = null,
     val lastUpdateAt: Long = 0,
     val isLoading: Boolean = false
 ) {
-    fun toUiState(): ScheduleUiState = if (group == null) {
-        ScheduleUiState.NoSchedule(isLoading)
+    fun toUiState(): TeacherScheduleUiState = if (teacher == null) {
+        TeacherScheduleUiState.NoData(isLoading)
     } else {
-        ScheduleUiState.HasSchedule(group, updateDates!!, lastUpdateAt, isLoading)
+        TeacherScheduleUiState.HasData(teacher, updateDates!!, lastUpdateAt, isLoading)
     }
 }
 
 @HiltViewModel
-class ScheduleViewModel @Inject constructor(
+class TeacherScheduleViewModel @Inject constructor(
     appContainer: AppContainer
 ) : ViewModel() {
     private val scheduleRepository = appContainer.scheduleRepository
     private val networkCacheRepository = appContainer.networkCacheRepository
-    private val viewModelState = MutableStateFlow(ScheduleViewModelState(isLoading = true))
+    private val viewModelState = MutableStateFlow(TeacherScheduleViewModelState(isLoading = true))
 
     val uiState = viewModelState
-        .map(ScheduleViewModelState::toUiState)
+        .map(TeacherScheduleViewModelState::toUiState)
         .stateIn(viewModelScope, SharingStarted.Eagerly, viewModelState.value.toUiState())
 
     init {
-        refreshGroup()
+        fetch(null)
     }
 
-    fun refreshGroup() {
+    fun fetch(name: String?) {
+        if (name == null) {
+            viewModelState.update {
+                it.copy(
+                    teacher = null,
+                    isLoading = false
+                )
+            }
+            return
+        }
+
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = scheduleRepository.getGroup()
+            val result = scheduleRepository.getTeacher(name)
 
             viewModelState.update {
                 when (result) {
@@ -72,7 +82,7 @@ class ScheduleViewModel @Inject constructor(
                         val updateDates = networkCacheRepository.getUpdateDates()
 
                         it.copy(
-                            group = result.data,
+                            teacher = result.data,
                             updateDates = updateDates,
                             lastUpdateAt = Date().time,
                             isLoading = false
@@ -80,7 +90,7 @@ class ScheduleViewModel @Inject constructor(
                     }
 
                     is MyResult.Failure -> it.copy(
-                        group = null,
+                        teacher = null,
                         isLoading = false
                     )
                 }

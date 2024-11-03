@@ -16,20 +16,19 @@ import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.MyResult
 import ru.n08i40k.polytechnic.next.model.Day
-import ru.n08i40k.polytechnic.next.model.Group
-import ru.n08i40k.polytechnic.next.model.Lesson
+import ru.n08i40k.polytechnic.next.model.GroupOrTeacher
 import ru.n08i40k.polytechnic.next.utils.dayMinutes
 import ru.n08i40k.polytechnic.next.utils.fmtAsClock
 import ru.n08i40k.polytechnic.next.utils.getDayMinutes
+import ru.n08i40k.polytechnic.next.utils.now
 import java.util.Calendar
 import java.util.logging.Logger
 
-@Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
 class CurrentLessonViewService : Service() {
     companion object {
         private const val NOTIFICATION_STATUS_ID = 1337
         private const val NOTIFICATION_END_ID = NOTIFICATION_STATUS_ID + 1
-        private const val UPDATE_INTERVAL = 60_000L
+        private const val UPDATE_INTERVAL = 1_000L
 
         suspend fun startService(application: PolytechnicApplication) {
             if (!application.hasNotificationPermission())
@@ -59,61 +58,32 @@ class CurrentLessonViewService : Service() {
         }
     }
 
-    private var day: Day? = null
+    private lateinit var day: Day
 
     private val handler = Handler(Looper.getMainLooper())
+
     private val updateRunnable = object : Runnable {
         override fun run() {
-            val logger = Logger.getLogger("CLV.updateRunnable")
+            val (currentIndex, currentLesson) = day.currentKV ?: (null to null)
+            val (nextIndex, _) = day.distanceToNext(currentIndex)
+                ?: (null to null)
 
-            if (day == null || day!!.lessons.isEmpty()) {
-                logger.warning("Stopping, because day is null or empty!")
-                stopSelf()
-                return
-            }
-
-            val currentMinutes = Calendar.getInstance()
-                .get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance()
-                .get(Calendar.MINUTE)
-
-            val currentLessonEntry = day!!.currentKV
-            val currentLessonIdx: Int? = currentLessonEntry?.first
-            val currentLesson: Lesson? = currentLessonEntry?.second
-
-            val nextLessonEntry = day!!.distanceToNextByIdx(currentLessonIdx)
-            val nextLesson =
-                if (nextLessonEntry == null)
-                    null
-                else
-                    day!!.lessons[nextLessonEntry.first]
+            val nextLesson = nextIndex?.let { day.lessons[nextIndex] }
 
             if (currentLesson == null && nextLesson == null) {
-                val notification = NotificationCompat
-                    .Builder(applicationContext, NotificationChannels.LESSON_VIEW)
-                    .setSmallIcon(R.drawable.schedule)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setContentTitle(getString(R.string.lessons_end_notification_title))
-                    .setContentText(getString(R.string.lessons_end_notification_description))
-                    .build()
-                getNotificationManager().notify(NOTIFICATION_END_ID, notification)
-
-                stopSelf()
+                onLessonsEnd()
                 return
             }
 
-            val firstLessonIdx =
-                day!!.distanceToNextByLocalDateTime(LocalDateTime(1, 1, 1, 0, 0))?.first
-                    ?: throw NullPointerException("Is this even real?")
-            val distanceToFirst = day!!.lessons[firstLessonIdx]!!.time!!.start.dayMinutes - currentMinutes
+            handler.postDelayed(this, UPDATE_INTERVAL)
 
-            val currentLessonDelay =
-                if (currentLesson == null) // Если эта пара - перемена, то конец перемены через (результат getDistanceToNext)
-                    nextLessonEntry!!.second
-                else // Если эта пара - обычная пара, то конец пары через (конец этой пары - текущее кол-во минут)
-                    currentLesson.time!!.end.dayMinutes - currentMinutes
+            val context = this@CurrentLessonViewService
+            val currentMinutes = LocalDateTime.now().dayMinutes
+
+            val distanceToFirst = day.first!!.time.start.dayMinutes - currentMinutes
 
             val currentLessonName =
-                currentLesson?.getNameAndCabinetsShort(this@CurrentLessonViewService)
+                currentLesson?.getNameAndCabinetsShort(context)
                     ?: run {
                         if (distanceToFirst > 0)
                             getString(R.string.lessons_not_started)
@@ -122,39 +92,40 @@ class CurrentLessonViewService : Service() {
                     }
 
             val nextLessonName =
-                if (currentLesson == null) // Если текущая пара - перемена
-                    nextLesson!!.getNameAndCabinetsShort(this@CurrentLessonViewService)
-                else if (nextLesson == null) // Если текущая пара - последняя
-                    getString(R.string.lessons_end)
-                else // Если после текущей пары есть ещё пара(ы)
-                    getString(R.string.lesson_break)
+                nextLesson?.getNameAndCabinetsShort(context) ?: getString(R.string.lessons_end)
 
-            val nextLessonTotal =
-                if (currentLesson == null)
-                    nextLesson!!.time!!.start
-                else
-                    currentLesson.time!!.end
+            val nextLessonIn =
+                (currentLesson?.time?.end ?: nextLesson!!.time.start).dayMinutes
 
             val notification = createNotification(
                 getString(
-                    if (distanceToFirst > 0)
-                        R.string.waiting_for_day_start_notification_title
-                    else
-                        R.string.lesson_going_notification_title,
-                    currentLessonDelay / 60,
-                    currentLessonDelay % 60
+                    if (distanceToFirst > 0) R.string.waiting_for_day_start_notification_title
+                    else R.string.lesson_going_notification_title,
+                    (nextLessonIn - currentMinutes) / 60,
+                    (nextLessonIn - currentMinutes) % 60
                 ),
                 getString(
                     R.string.lesson_going_notification_description,
                     currentLessonName,
-                    nextLessonTotal.dayMinutes.fmtAsClock(),
+                    nextLessonIn.fmtAsClock(),
                     nextLessonName,
                 )
             )
             getNotificationManager().notify(NOTIFICATION_STATUS_ID, notification)
-
-            handler.postDelayed(this, UPDATE_INTERVAL)
         }
+    }
+
+    private fun onLessonsEnd() {
+        val notification = NotificationCompat
+            .Builder(applicationContext, NotificationChannels.LESSON_VIEW)
+            .setSmallIcon(R.drawable.schedule)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentTitle(getString(R.string.lessons_end_notification_title))
+            .setContentText(getString(R.string.lessons_end_notification_description))
+            .build()
+        getNotificationManager().notify(NOTIFICATION_END_ID, notification)
+
+        stopSelf()
     }
 
     private fun createNotification(
@@ -176,7 +147,7 @@ class CurrentLessonViewService : Service() {
         return getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private fun updateSchedule(group: Group?) {
+    private fun updateSchedule(group: GroupOrTeacher?) {
         val logger = Logger.getLogger("CLV")
 
         if (group == null) {
@@ -223,7 +194,7 @@ class CurrentLessonViewService : Service() {
 
         updateSchedule(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("group", Group::class.java)
+                intent.getParcelableExtra("group", GroupOrTeacher::class.java)
             } else {
                 @Suppress("DEPRECATION")
                 intent.getParcelableExtra("group")

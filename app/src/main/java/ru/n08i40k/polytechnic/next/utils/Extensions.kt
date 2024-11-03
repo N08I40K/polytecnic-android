@@ -43,6 +43,9 @@ val Instant.dayMinutes: Int
 val LocalDateTime.dayMinutes: Int
     get() = this.hour * 60 + this.minute
 
+fun LocalDateTime.Companion.fromEpochMilliseconds(milliseconds: Long): LocalDateTime =
+    Instant.fromEpochMilliseconds(milliseconds).dateTime
+
 val Instant.dateTime: LocalDateTime
     get() = this.toLocalDateTime(TimeZone.currentSystemDefault())
 

@@ -15,6 +15,7 @@ data class Lesson(
     val defaultRange: List<Int>?,
     val name: String?,
     val time: LessonTime,
+    val group: String? = null,
     val subGroups: List<SubGroup>
 ) : Parcelable {
     val duration: Int
@@ -26,6 +27,10 @@ data class Lesson(
         }
 
     fun getNameAndCabinetsShort(context: Context): String {
+        val name =
+            if (type == LessonType.BREAK) context.getString(R.string.lesson_break)
+            else this.name
+
         val limitedName = name!! limit 15
 
         val cabinets = subGroups.map { it.cabinet }

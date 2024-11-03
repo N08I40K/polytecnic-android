@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.ui.main.schedule
+package ru.n08i40k.polytechnic.next.ui.main.schedule.group
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable

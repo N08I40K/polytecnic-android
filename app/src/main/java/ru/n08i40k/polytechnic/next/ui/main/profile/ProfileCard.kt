@@ -38,7 +38,7 @@ import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
-import ru.n08i40k.polytechnic.next.ui.model.ScheduleViewModel
+import ru.n08i40k.polytechnic.next.ui.model.GroupScheduleViewModel
 import ru.n08i40k.polytechnic.next.ui.model.profileViewModel
 
 @Preview(showBackground = true)
@@ -176,8 +176,8 @@ internal fun ProfileCard(profile: Profile = FakeProfileRepository.exampleProfile
                     }
 
                     if (groupChanging) {
-                        val scheduleViewModel =
-                            hiltViewModel<ScheduleViewModel>(LocalContext.current as ComponentActivity)
+                        val groupScheduleViewModel =
+                            hiltViewModel<GroupScheduleViewModel>(LocalContext.current as ComponentActivity)
 
                         ChangeGroupDialog(
                             context,
@@ -194,7 +194,7 @@ internal fun ProfileCard(profile: Profile = FakeProfileRepository.exampleProfile
                                         .clear()
                                 }
                                 context.profileViewModel!!.refreshProfile {
-                                    scheduleViewModel.refreshGroup()
+                                    groupScheduleViewModel.refresh()
                                 }
                             }
                         ) { groupChanging = false }

@@ -17,7 +17,7 @@ import androidx.compose.ui.util.lerp
 import kotlinx.datetime.LocalDateTime
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.schedule.impl.FakeScheduleRepository
-import ru.n08i40k.polytechnic.next.model.Group
+import ru.n08i40k.polytechnic.next.model.GroupOrTeacher
 import ru.n08i40k.polytechnic.next.ui.widgets.NotificationCard
 import ru.n08i40k.polytechnic.next.utils.dateTime
 import ru.n08i40k.polytechnic.next.utils.now
@@ -25,9 +25,9 @@ import java.util.Calendar
 import java.util.logging.Level
 import kotlin.math.absoluteValue
 
-private fun isScheduleOutdated(group: Group): Boolean {
+private fun isScheduleOutdated(groupOrTeacher: GroupOrTeacher): Boolean {
     val nowDateTime = LocalDateTime.now()
-    val lastDay = group.days.lastOrNull() ?: return true
+    val lastDay = groupOrTeacher.days.lastOrNull() ?: return true
     val lastLesson = lastDay.last ?: return true
 
     return nowDateTime > lastLesson.time.end.dateTime
@@ -35,17 +35,17 @@ private fun isScheduleOutdated(group: Group): Boolean {
 
 @Preview
 @Composable
-fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
+fun DayPager(groupOrTeacher: GroupOrTeacher = FakeScheduleRepository.exampleGroup) {
     val currentDay = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2)
     val calendarDay = if (currentDay == -1) 6 else currentDay
 
     val pagerState = rememberPagerState(
         initialPage = calendarDay
-            .coerceAtMost(group.days.size - 1),
-        pageCount = { group.days.size })
+            .coerceAtMost(groupOrTeacher.days.size - 1),
+        pageCount = { groupOrTeacher.days.size })
 
     Column {
-        if (isScheduleOutdated(group)) {
+        if (isScheduleOutdated(groupOrTeacher)) {
             NotificationCard(
                 level = Level.WARNING,
                 title = stringResource(R.string.outdated_schedule)
@@ -73,7 +73,7 @@ fun DayPager(group: Group = FakeScheduleRepository.exampleGroup) {
                         start = 0.5f, stop = 1f, fraction = 1f - offset.coerceIn(0f, 1f)
                     )
                 },
-                day = group.days[page],
+                day = groupOrTeacher.days[page],
                 distance = page - currentDay
             )
         }
