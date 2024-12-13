@@ -150,6 +150,7 @@ fun DayCard(
                     LessonType.INDEPENDENT_WORK -> customCardColors
                     LessonType.EXAM -> examCardColors
                     LessonType.EXAM_WITH_GRADE -> examCardColors
+                    LessonType.EXAM_DEFAULT -> examCardColors
                 }
 
                 val mutableExpanded = remember { mutableStateOf(false) }

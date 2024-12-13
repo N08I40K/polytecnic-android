@@ -18,4 +18,5 @@ enum class LessonType(val value: Int) {
     INDEPENDENT_WORK(4),
     EXAM(5),
     EXAM_WITH_GRADE(6),
+    EXAM_DEFAULT(7)
 }

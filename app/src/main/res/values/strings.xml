@@ -82,6 +82,7 @@
     <string name="failed_to_fetch_teacher_names">Failed to fetch teacher names!</string>
     <string name="lesson_type_consultation">Consultation</string>
     <string name="lesson_type_independent_work">Independent work</string>
-    <string name="lesson_type_exam">EXAM</string>
-    <string name="lesson_type_exam_with_grade">EXAM WITH GRADE</string>
+    <string name="lesson_type_exam">EXAM*</string>
+    <string name="lesson_type_exam_with_grade">EXAM* WITH GRADE</string>
+    <string name="lesson_type_exam_default">EXAM</string>
 </resources>

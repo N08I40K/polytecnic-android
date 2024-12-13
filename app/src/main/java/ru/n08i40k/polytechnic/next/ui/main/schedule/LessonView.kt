@@ -194,6 +194,7 @@ private fun LessonViewRow(
                                     LessonType.INDEPENDENT_WORK -> stringResource(R.string.lesson_type_independent_work)
                                     LessonType.EXAM -> stringResource(R.string.lesson_type_exam)
                                     LessonType.EXAM_WITH_GRADE -> stringResource(R.string.lesson_type_exam_with_grade)
+                                    LessonType.EXAM_DEFAULT -> stringResource(R.string.lesson_type_exam_default)
                                     else -> throw Error("Unknown lesson type!")
                                 },
                                 fontWeight = FontWeight.Bold,
