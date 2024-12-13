@@ -27,14 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import kotlinx.datetime.LocalDateTime
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.schedule.impl.FakeScheduleRepository
-import ru.n08i40k.polytechnic.next.model.Day
 import ru.n08i40k.polytechnic.next.model.Lesson
-import ru.n08i40k.polytechnic.next.model.LessonTime
 import ru.n08i40k.polytechnic.next.model.LessonType
-import ru.n08i40k.polytechnic.next.model.SubGroup
 import ru.n08i40k.polytechnic.next.utils.dayMinutes
 import ru.n08i40k.polytechnic.next.utils.fmtAsClock
 
@@ -55,7 +51,7 @@ private fun fmtTime(start: Int, end: Int, format: LessonTimeFormat): ArrayList<S
         LessonTimeFormat.ONLY_MINUTES_DURATION -> {
             val duration = end - start
 
-            arrayListOf("$duration " + stringResource(R.string.minutes))
+            arrayListOf("$duration" + stringResource(R.string.minutes))
         }
     }
 }
@@ -109,15 +105,8 @@ fun LessonExtraInfo(
 @Preview(showBackground = true)
 @Composable
 private fun LessonViewRow(
-    range: List<Int>? = listOf(1, 3),
-    time: LessonTime = LessonTime.fromLocalDateTime(
-        LocalDateTime(2024, 1, 1, 0, 0),
-        LocalDateTime(2024, 1, 1, 1, 0),
-    ),
+    lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[4],
     timeFormat: LessonTimeFormat = LessonTimeFormat.FROM_TO,
-    name: String = "Test",
-    subGroups: List<SubGroup> = listOf(),
-    group: String? = "ИС-214/23",
     cardColors: CardColors = CardDefaults.cardColors(),
     verticalPadding: Dp = 10.dp,
     now: Boolean = true,
@@ -126,7 +115,9 @@ private fun LessonViewRow(
         if (timeFormat == LessonTimeFormat.FROM_TO) cardColors.contentColor
         else cardColors.disabledContentColor
 
-    val rangeSize = if (range == null) 1 else (range[1] - range[0] + 1) * 2
+    val rangeSize =
+        if (lesson.defaultRange == null) 1
+        else (lesson.defaultRange[1] - lesson.defaultRange[0] + 1) * 2
 
     Box(
         if (now) Modifier.border(
@@ -146,17 +137,18 @@ private fun LessonViewRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val rangeString = run {
-                if (range == null)
+                if (lesson.defaultRange == null)
                     "   "
                 else
                     buildString {
-                        val same = range[0] == range[1]
+                        val same = lesson.defaultRange[0] == lesson.defaultRange[1]
 
-                        append(if (same) " " else range[0])
-                        append(if (same) range[0] else "-")
-                        append(if (same) " " else range[1])
+                        append(if (same) " " else lesson.defaultRange[0])
+                        append(if (same) lesson.defaultRange[0] else "-")
+                        append(if (same) " " else lesson.defaultRange[1])
                     }
             }
+            // 1-2
             Text(
                 text = rangeString,
                 fontFamily = FontFamily.Monospace,
@@ -170,8 +162,9 @@ private fun LessonViewRow(
                 verticalArrangement = Arrangement.Center
             ) {
                 val formattedTime: ArrayList<String> =
-                    fmtTime(time.start.dayMinutes, time.end.dayMinutes, timeFormat)
+                    fmtTime(lesson.time.start.dayMinutes, lesson.time.end.dayMinutes, timeFormat)
 
+                // 10:20 - 11:40
                 Text(
                     text = formattedTime[0],
                     fontFamily = FontFamily.Monospace,
@@ -194,17 +187,32 @@ private fun LessonViewRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
+                        if (lesson.type.value > LessonType.BREAK.value) {
+                            Text(
+                                text = when (lesson.type) {
+                                    LessonType.CONSULTATION -> stringResource(R.string.lesson_type_consultation)
+                                    LessonType.INDEPENDENT_WORK -> stringResource(R.string.lesson_type_independent_work)
+                                    LessonType.EXAM -> stringResource(R.string.lesson_type_exam)
+                                    LessonType.EXAM_WITH_GRADE -> stringResource(R.string.lesson_type_exam_with_grade)
+                                    else -> throw Error("Unknown lesson type!")
+                                },
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = contentColor
+                            )
+                        }
                         Text(
-                            text = name,
+                            text = lesson.name ?: stringResource(R.string.lesson_break),
                             fontWeight = FontWeight.Medium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = contentColor
                         )
 
-                        if (group != null) {
+                        if (lesson.group != null) {
                             Text(
-                                text = group,
+                                text = lesson.group,
                                 fontWeight = FontWeight.Medium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -212,9 +220,10 @@ private fun LessonViewRow(
                             )
                         }
 
-                        for (subGroup in subGroups) {
+                        for (subGroup in lesson.subGroups) {
                             Text(
                                 text = subGroup.teacher,
+                                fontWeight = FontWeight.Thin,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = contentColor
@@ -223,14 +232,17 @@ private fun LessonViewRow(
                     }
 
                     Column(modifier = Modifier.wrapContentWidth()) {
-                        if (subGroups.size != 1) {
-                            for (i in 0..<(if (group != null) 2 else 1))
+                        if (lesson.subGroups.size != 1) {
+                            Text(text = "")
+
+                            if (lesson.group != null)
                                 Text(text = "")
                         }
-                        for (subGroup in subGroups) {
+                        for (subGroup in lesson.subGroups) {
                             Text(
                                 text = subGroup.cabinet,
                                 maxLines = 1,
+                                fontWeight = FontWeight.Thin,
                                 fontFamily = FontFamily.Monospace,
                                 color = contentColor
                             )
@@ -247,17 +259,12 @@ private fun LessonViewRow(
 @Composable
 fun FreeLessonRow(
     lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[0],
-    nextLesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[1],
     cardColors: CardColors = CardDefaults.cardColors(),
     now: Boolean = true
 ) {
     LessonViewRow(
-        lesson.defaultRange,
-        LessonTime(lesson.time.start, nextLesson.time.end),
+        lesson,
         LessonTimeFormat.ONLY_MINUTES_DURATION,
-        stringResource(R.string.lesson_break),
-        lesson.subGroups,
-        lesson.group,
         cardColors,
         2.5.dp,
         now
@@ -267,18 +274,13 @@ fun FreeLessonRow(
 @Preview(showBackground = true)
 @Composable
 fun LessonRow(
-    day: Day = FakeScheduleRepository.exampleGroup.days[0],
     lesson: Lesson = FakeScheduleRepository.exampleGroup.days[0].lessons[0],
     cardColors: CardColors = CardDefaults.cardColors(),
     now: Boolean = true,
 ) {
     LessonViewRow(
-        lesson.defaultRange,
-        lesson.time,
+        lesson,
         LessonTimeFormat.FROM_TO,
-        lesson.name!!,
-        lesson.subGroups,
-        lesson.group,
         cardColors,
         5.dp,
         now

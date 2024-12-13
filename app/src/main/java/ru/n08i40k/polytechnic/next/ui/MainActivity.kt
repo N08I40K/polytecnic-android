@@ -25,9 +25,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.google.firebase.Firebase
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -44,8 +41,6 @@ import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-
     private val configSettings = remoteConfigSettings {
         minimumFetchIntervalInSeconds = 3600
     }
@@ -118,6 +113,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupFirebaseConfig() {
+        val remoteConfig = (application as PolytechnicApplication).container.remoteConfig
+
         remoteConfig.setConfigSettingsAsync(configSettings)
         remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
 

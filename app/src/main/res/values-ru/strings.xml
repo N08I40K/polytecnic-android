@@ -80,4 +80,8 @@
     <string name="teacher_name">ФИО преподавателя</string>
     <string name="teacher_not_selected">Преподаватель не выбран или вы допустили ошибку в его ФИО.</string>
     <string name="failed_to_fetch_teacher_names">Не удалось получить список ФИО преподавателей!</string>
+    <string name="lesson_type_consultation">Консультация</string>
+    <string name="lesson_type_independent_work">Самостоятельная работа</string>
+    <string name="lesson_type_exam">ЗАЧЁТ</string>
+    <string name="lesson_type_exam_with_grade">ЗАЧЁТ С ОЦЕНКОЙ</string>
 </resources>

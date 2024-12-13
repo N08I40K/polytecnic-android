@@ -33,11 +33,6 @@ open class CachedRequest(
 }, errorListener) {
     private val appContainer: AppContainer = (context as PolytechnicApplication).container
 
-    companion object {
-        private const val REGEX: String = "<a href=\"(/\\d{4}/[\\w\\-_]+\\.xls)\">"
-        val pattern: Pattern = Pattern.compile(REGEX, Pattern.MULTILINE)
-    }
-
     private suspend fun getXlsUrl(): MyResult<String> = withContext(Dispatchers.IO) {
         val mainPageFuture = RequestFuture.newFuture<String>()
         val request = StringRequest(
@@ -53,6 +48,11 @@ open class CachedRequest(
             return@withContext response
 
         val pageData = (response as MyResult.Success).data
+
+        val remoteConfig = (context.applicationContext as PolytechnicApplication).container.remoteConfig
+
+        val pattern: Pattern =
+            Pattern.compile(remoteConfig.getString("linkParserRegex"), Pattern.MULTILINE)
 
         val matcher = pattern.matcher(pageData)
         if (!matcher.find())

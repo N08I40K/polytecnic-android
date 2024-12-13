@@ -15,7 +15,7 @@ class ScheduleUpdate(
 ) : AuthorizedRequest(
     context,
     Method.PATCH,
-    "v2/schedule/update-download-url",
+    "v4/schedule/update-download-url",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {

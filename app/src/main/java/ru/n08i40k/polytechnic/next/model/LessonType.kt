@@ -13,5 +13,9 @@ private class LessonTypeIntSerializer : EnumAsIntSerializer<LessonType>(
 enum class LessonType(val value: Int) {
     DEFAULT(0),
     ADDITIONAL(1),
-    BREAK(2)
+    BREAK(2),
+    CONSULTATION(3),
+    INDEPENDENT_WORK(4),
+    EXAM(5),
+    EXAM_WITH_GRADE(6),
 }

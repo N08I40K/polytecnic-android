@@ -63,7 +63,6 @@ import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.model.UserRole
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
-import ru.n08i40k.polytechnic.next.ui.MainActivity
 import ru.n08i40k.polytechnic.next.ui.icons.AppIcons
 import ru.n08i40k.polytechnic.next.ui.icons.appicons.Filled
 import ru.n08i40k.polytechnic.next.ui.icons.appicons.filled.Download
@@ -289,7 +288,7 @@ fun MainScreen(
         viewModel(
             factory = RemoteConfigViewModel.provideFactory(
                 appContext = LocalContext.current,
-                remoteConfig = (LocalContext.current as MainActivity).remoteConfig
+                remoteConfig = (LocalContext.current.applicationContext as PolytechnicApplication).container.remoteConfig
             )
         )
 

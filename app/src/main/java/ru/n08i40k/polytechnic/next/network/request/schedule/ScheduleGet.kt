@@ -14,7 +14,7 @@ class ScheduleGet(
 ) : CachedRequest(
     context,
     Method.GET,
-    "v2/schedule/group",
+    "v3/schedule/group",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {

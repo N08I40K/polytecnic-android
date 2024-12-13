@@ -15,7 +15,7 @@ class ScheduleGetTeacher(
 ) : CachedRequest(
     context,
     Method.GET,
-    "v2/schedule/teacher/$teacher",
+    "v3/schedule/teacher/$teacher",
     { listener.onResponse(Json.decodeFromString(it)) },
     errorListener
 ) {

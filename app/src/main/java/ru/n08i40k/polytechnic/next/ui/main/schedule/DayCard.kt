@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +68,10 @@ fun DayCard(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
     )
+    val examCardColors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.errorContainer,
+        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+    )
 
     Card(
         modifier = modifier,
@@ -93,18 +99,29 @@ fun DayCard(
             text = day.name,
         )
 
+        if (day.street != null) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                fontWeight = FontWeight.ExtraLight,
+                textAlign = TextAlign.Center,
+                text = day.street,
+            )
+        }
+
         if (distance >= -1 && distance <= 1) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
-                text = stringResource(when (distance) {
-                    -1 -> R.string.yesterday
-                    0 -> R.string.today
-                    1 -> R.string.tomorrow
-                    else -> throw RuntimeException()
-                }),
+                text = stringResource(
+                    when (distance) {
+                        -1 -> R.string.yesterday
+                        0 -> R.string.today
+                        1 -> R.string.tomorrow
+                        else -> throw RuntimeException()
+                    }
+                ),
             )
         }
 
@@ -112,7 +129,9 @@ fun DayCard(
             .collectAsStateWithLifecycle(0)
 
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(0.5.dp)
         ) {
             if (day.lessons.isEmpty()) {
@@ -125,8 +144,12 @@ fun DayCard(
 
                 val cardColors = when (lesson.type) {
                     LessonType.DEFAULT -> defaultCardColors
-                    LessonType.ADDITIONAL -> customCardColors
+                    LessonType.ADDITIONAL -> noneCardColors
                     LessonType.BREAK -> noneCardColors
+                    LessonType.CONSULTATION -> customCardColors
+                    LessonType.INDEPENDENT_WORK -> customCardColors
+                    LessonType.EXAM -> examCardColors
+                    LessonType.EXAM_WITH_GRADE -> examCardColors
                 }
 
                 val mutableExpanded = remember { mutableStateOf(false) }
@@ -139,14 +162,15 @@ fun DayCard(
                     val now = lessonIdx == currentLessonIdx
 
                     if (lesson.type === LessonType.BREAK)
-                        FreeLessonRow(lesson, lesson, cardColors, now)
+                        FreeLessonRow(lesson, cardColors, now)
                     else
-                        LessonRow(day, lesson, cardColors, now)
+                        LessonRow(lesson, cardColors, now)
                 }
 
                 if (mutableExpanded.value)
                     LessonExtraInfo(lesson, mutableExpanded)
             }
+
         }
     }
 }

@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <defaults>
   <entry>
+    <key>serverVersion</key>
+    <value>2.2.2</value>
+  </entry>
+  <entry>
     <key>linkUpdateDelay</key>
     <value>15</value>
   </entry>
   <entry>
     <key>minVersion</key>
-    <value>1.3.0</value>
-  </entry>
-  <entry>
-    <key>currVersion</key>
-    <value>1.5.0</value>
-  </entry>
-  <entry>
-    <key>downloadLink</key>
-    <value>https://t.me/polytechnic_next/16</value>
+    <value>2.0.1</value>
   </entry>
   <entry>
     <key>telegramLink</key>
     <value>https://t.me/polytechnic_next</value>
   </entry>
   <entry>
-    <key>serverVersion</key>
-    <value>1.3.0</value>
+    <key>linkParserRegex</key>
+    <value>&lt;a href="(/\d{4}/[.\w\-_]+\.xls)"&gt;</value>
+  </entry>
+  <entry>
+    <key>downloadLink</key>
+    <value>https://t.me/polytechnic_next/68</value>
+  </entry>
+  <entry>
+    <key>currVersion</key>
+    <value>2.2.1</value>
   </entry>
 </defaults>

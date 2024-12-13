@@ -53,7 +53,7 @@ fun DayPager(groupOrTeacher: GroupOrTeacher = FakeScheduleRepository.exampleGrou
         }
         HorizontalPager(
             state = pagerState,
-            contentPadding = PaddingValues(horizontal = 20.dp),
+            contentPadding = PaddingValues(horizontal = 7.dp),
             verticalAlignment = Alignment.Top,
             modifier = Modifier
                 .height(600.dp)

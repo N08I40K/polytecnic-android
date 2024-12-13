@@ -22,7 +22,9 @@ data class Day(
     @SerialName("date")
     private val dateMillis: Long,
 
-    val lessons: List<Lesson>
+    val lessons: List<Lesson>,
+
+    val street: String? = null
 ) : Parcelable {
     constructor(name: String, date: Instant, lessons: List<Lesson>) : this(
         name, date.toEpochMilliseconds(), lessons
