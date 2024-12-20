@@ -1,4 +1,4 @@
-package ru.n08i40k.polytechnic.next.ui.main.schedule.teacher
+package ru.n08i40k.polytechnic.next.ui.main.schedule.teacher.user
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -61,7 +61,9 @@ fun DayPager(groupOrTeacher: GroupOrTeacher = FakeScheduleRepository.exampleGrou
         ) { page ->
             DayCard(
                 modifier = Modifier.graphicsLayer {
-                    val offset = pagerState.getOffsetDistanceInPages(page).absoluteValue
+                    val offset = pagerState.getOffsetDistanceInPages(
+                        page.coerceIn(0, pagerState.pageCount - 1)
+                    ).absoluteValue
 
                     lerp(
                         start = 1f, stop = 0.95f, fraction = 1f - offset.coerceIn(0f, 1f)

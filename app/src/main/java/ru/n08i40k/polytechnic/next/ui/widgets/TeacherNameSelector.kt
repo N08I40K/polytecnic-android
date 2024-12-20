@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -24,38 +24,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import ru.n08i40k.polytechnic.next.R
-import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleGetGroupNames
+import ru.n08i40k.polytechnic.next.network.request.schedule.ScheduleGetTeacherNames
 
 @Composable
 private fun getTeacherNames(context: Context, onUpdated: (String?) -> Unit): ArrayList<String?> {
     val groupPlaceholder = stringResource(R.string.loading)
 
-    val groups = remember { arrayListOf(null, groupPlaceholder) }
+    val names = remember { arrayListOf(null, groupPlaceholder) }
 
-    LaunchedEffect(groups) {
-        ScheduleGetGroupNames(context, {
-            groups.clear()
-            groups.addAll(it.names)
-            onUpdated(groups.getOrElse(0) { "TODO" }!!)
+    LaunchedEffect(names) {
+        ScheduleGetTeacherNames(context, {
+            names.clear()
+            names.addAll(it.names)
+            onUpdated(names.getOrElse(0) { "TODO" }!!)
         }, {
-            groups.clear()
-            groups.add(null)
-            groups.add(context.getString(R.string.failed_to_fetch_group_names))
-            onUpdated(groups[1]!!)
+            names.clear()
+            names.add(null)
+            names.add(context.getString(R.string.failed_to_fetch_teacher_names))
+            onUpdated(names[1]!!)
         }).send()
     }
 
-    return groups
+    return names
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun GroupSelector(
-    value: String? = "ИС-214/24",
+fun TeacherNameSelector(
+    value: String? = "Фамилия И.О.",
     isError: Boolean = false,
     readOnly: Boolean = false,
-    teacher: Boolean = false,
     onValueChange: (String?) -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -69,16 +68,16 @@ fun GroupSelector(
                 expanded = !readOnly && !expanded
             }
         ) {
-            val groups = getTeacherNames(LocalContext.current, onValueChange)
+            val names = getTeacherNames(LocalContext.current, onValueChange)
 
             TextField(
-                label = { Text(stringResource(if (teacher) R.string.supervised_group else R.string.group)) },
+                label = { Text(stringResource(R.string.username)) },
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
-                value = value ?: groups.getOrElse(1) { "TODO" }!!,
+                value = value ?: names.getOrElse(1) { "TODO" }!!,
                 leadingIcon = {
                     Icon(
-                        Icons.Filled.Email,
-                        contentDescription = "group"
+                        Icons.Filled.Person,
+                        contentDescription = "username"
                     )
                 },
                 onValueChange = {},
@@ -91,14 +90,14 @@ fun GroupSelector(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                groups.forEach {
+                names.forEach {
                     if (it == null)
                         return@forEach
 
                     DropdownMenuItem(
                         text = { Text(it) },
                         onClick = {
-                            if (groups.isNotEmpty() && groups[0] != null)
+                            if (names.isNotEmpty() && names[0] != null)
                                 onValueChange(it)
                             expanded = false
                         }

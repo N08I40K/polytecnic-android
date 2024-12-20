@@ -23,6 +23,7 @@ import com.android.volley.ClientError
 import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.data.users.impl.FakeProfileRepository
 import ru.n08i40k.polytechnic.next.model.Profile
+import ru.n08i40k.polytechnic.next.model.UserRole
 import ru.n08i40k.polytechnic.next.network.request.profile.ProfileChangeGroup
 import ru.n08i40k.polytechnic.next.ui.widgets.GroupSelector
 
@@ -65,10 +66,10 @@ internal fun ChangeGroupDialog(
 
                 GroupSelector(
                     value = group,
-                    onValueChange = { group = it },
                     isError = groupError,
-                    readOnly = processing
-                )
+                    readOnly = processing,
+                    teacher = profile.role == UserRole.TEACHER
+                ) { group = it }
 
                 val focusManager = LocalFocusManager.current
                 Button(

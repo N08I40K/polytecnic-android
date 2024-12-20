@@ -85,4 +85,6 @@
     <string name="lesson_type_exam">EXAM*</string>
     <string name="lesson_type_exam_with_grade">EXAM* WITH GRADE</string>
     <string name="lesson_type_exam_default">EXAM</string>
+    <string name="supervised_group">Supervised group</string>
+    <string name="teacher_schedule">Teacher</string>
 </resources>

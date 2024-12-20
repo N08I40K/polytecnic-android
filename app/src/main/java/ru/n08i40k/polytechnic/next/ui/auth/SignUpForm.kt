@@ -29,6 +29,7 @@ import ru.n08i40k.polytechnic.next.R
 import ru.n08i40k.polytechnic.next.model.UserRole
 import ru.n08i40k.polytechnic.next.ui.widgets.GroupSelector
 import ru.n08i40k.polytechnic.next.ui.widgets.RoleSelector
+import ru.n08i40k.polytechnic.next.ui.widgets.TeacherNameSelector
 
 
 @Preview(showBackground = true)
@@ -105,17 +106,26 @@ internal fun RegisterForm(
 
         Spacer(modifier = Modifier.size(10.dp))
 
-        OutlinedTextField(
-            value = username,
-            singleLine = true,
-            onValueChange = {
-                username = it
-                usernameError = false
-            },
-            label = { Text(stringResource(R.string.username)) },
-            isError = usernameError,
-            readOnly = loading
-        )
+        if (role != UserRole.TEACHER) {
+            OutlinedTextField(
+                value = username,
+                singleLine = true,
+                onValueChange = {
+                    username = it
+                    usernameError = false
+                },
+                label = { Text(stringResource(R.string.username)) },
+                isError = usernameError,
+                readOnly = loading
+            )
+        } else {
+            TeacherNameSelector(
+                value = username,
+                isError = usernameError,
+                readOnly = loading,
+                onValueChange = { username = it ?: "" }
+            )
+        }
 
         OutlinedTextField(
             value = password,
@@ -135,7 +145,8 @@ internal fun RegisterForm(
         GroupSelector(
             value = group,
             isError = groupError,
-            readOnly = loading
+            readOnly = loading,
+            teacher = role == UserRole.TEACHER
         ) {
             groupError = false
             group = it

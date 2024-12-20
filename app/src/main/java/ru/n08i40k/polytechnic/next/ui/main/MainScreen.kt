@@ -61,6 +61,7 @@ import kotlinx.coroutines.runBlocking
 import ru.n08i40k.polytechnic.next.MainViewModel
 import ru.n08i40k.polytechnic.next.PolytechnicApplication
 import ru.n08i40k.polytechnic.next.R
+import ru.n08i40k.polytechnic.next.model.Profile
 import ru.n08i40k.polytechnic.next.model.UserRole
 import ru.n08i40k.polytechnic.next.settings.settingsDataStore
 import ru.n08i40k.polytechnic.next.ui.icons.AppIcons
@@ -70,7 +71,8 @@ import ru.n08i40k.polytechnic.next.ui.icons.appicons.filled.Telegram
 import ru.n08i40k.polytechnic.next.ui.main.profile.ProfileScreen
 import ru.n08i40k.polytechnic.next.ui.main.replacer.ReplacerScreen
 import ru.n08i40k.polytechnic.next.ui.main.schedule.group.GroupScheduleScreen
-import ru.n08i40k.polytechnic.next.ui.main.schedule.teacher.TeacherScheduleScreen
+import ru.n08i40k.polytechnic.next.ui.main.schedule.teacher.main.TeacherMainScheduleScreen
+import ru.n08i40k.polytechnic.next.ui.main.schedule.teacher.user.TeacherUserScheduleScreen
 import ru.n08i40k.polytechnic.next.ui.model.GroupScheduleViewModel
 import ru.n08i40k.polytechnic.next.ui.model.ProfileUiState
 import ru.n08i40k.polytechnic.next.ui.model.ProfileViewModel
@@ -84,15 +86,27 @@ import ru.n08i40k.polytechnic.next.ui.model.profileViewModel
 private fun NavHostContainer(
     navController: NavHostController,
     padding: PaddingValues,
+    profileViewModel: ProfileViewModel,
     groupScheduleViewModel: GroupScheduleViewModel,
     teacherScheduleViewModel: TeacherScheduleViewModel,
     scheduleReplacerViewModel: ScheduleReplacerViewModel?
 ) {
     val context = LocalContext.current
 
+    val profileUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
+
+    val profile: Profile? = when (profileUiState) {
+        is ProfileUiState.NoProfile -> null
+        is ProfileUiState.HasProfile ->
+            (profileUiState as ProfileUiState.HasProfile).profile
+    }
+
+    if (profile == null)
+        return
+
     NavHost(
         navController = navController,
-        startDestination = "schedule",
+        startDestination = if (profile.role == UserRole.TEACHER) "teacher-main-schedule" else "schedule",
         modifier = Modifier.padding(paddingValues = padding),
         enterTransition = {
             slideIn(
@@ -126,8 +140,16 @@ private fun NavHostContainer(
             GroupScheduleScreen(groupScheduleViewModel) { groupScheduleViewModel.refresh() }
         }
 
-        composable("teacher-schedule") {
-            TeacherScheduleScreen(teacherScheduleViewModel) {
+        composable("teacher-user-schedule") {
+            TeacherUserScheduleScreen(teacherScheduleViewModel) {
+                if (it.isNotEmpty()) teacherScheduleViewModel.fetch(
+                    it
+                )
+            }
+        }
+
+        composable("teacher-main-schedule") {
+            TeacherMainScheduleScreen(teacherScheduleViewModel) {
                 if (it.isNotEmpty()) teacherScheduleViewModel.fetch(
                     it
                 )
@@ -231,14 +253,14 @@ private fun TopNavBar(
 }
 
 @Composable
-private fun BottomNavBar(navController: NavHostController, isAdmin: Boolean) {
+private fun BottomNavBar(navController: NavHostController, userRole: UserRole) {
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
 
         val currentRoute = navBackStackEntry?.destination?.route
 
         Constants.bottomNavItem.forEach {
-            if (it.isAdmin && !isAdmin)
+            if (it.requiredRole != null && it.requiredRole != userRole && userRole != UserRole.ADMIN)
                 return@forEach
 
             NavigationBarItem(
@@ -303,17 +325,17 @@ fun MainScreen(
     // schedule replacer view model
     val profileUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
-    val isAdmin = when (profileUiState) {
-        is ProfileUiState.NoProfile -> false
-        is ProfileUiState.HasProfile -> {
-            val profile = (profileUiState as ProfileUiState.HasProfile).profile
-
-            profile.role == UserRole.ADMIN
-        }
+    val profile: Profile? = when (profileUiState) {
+        is ProfileUiState.NoProfile -> null
+        is ProfileUiState.HasProfile ->
+            (profileUiState as ProfileUiState.HasProfile).profile
     }
 
+    if (profile == null)
+        return
+
     val scheduleReplacerViewModel: ScheduleReplacerViewModel? =
-        if (isAdmin) hiltViewModel(LocalContext.current as ComponentActivity)
+        if (profile.role == UserRole.ADMIN) hiltViewModel(LocalContext.current as ComponentActivity)
         else null
 
     // nav controller
@@ -321,11 +343,12 @@ fun MainScreen(
     val navController = rememberNavController()
     Scaffold(
         topBar = { TopNavBar(remoteConfigViewModel) },
-        bottomBar = { BottomNavBar(navController, isAdmin) }
+        bottomBar = { BottomNavBar(navController, profile.role) }
     ) { paddingValues ->
         NavHostContainer(
             navController,
             paddingValues,
+            profileViewModel,
             groupScheduleViewModel,
             teacherScheduleViewModel,
             scheduleReplacerViewModel

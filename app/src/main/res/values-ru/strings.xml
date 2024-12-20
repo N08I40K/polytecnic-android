@@ -85,4 +85,6 @@
     <string name="lesson_type_exam">ЗАЧЁТ</string>
     <string name="lesson_type_exam_with_grade">ЗАЧЁТ С ОЦЕНКОЙ</string>
     <string name="lesson_type_exam_default">ЭКЗАМЕН</string>
+    <string name="supervised_group">Курируемая группа</string>
+    <string name="teacher_schedule">Преподаватель</string>
 </resources>
